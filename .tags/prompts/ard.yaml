@@ -1,0 +1,53 @@
+parameters:
+  temperature: null
+  topP: null
+  topK: null
+  frequencyPenalty: null
+  presencePenalty: null
+  maxOutputTokens: null
+  stopSequences: null
+
+defaults:
+  business-requirements: "file://docs/2026-01-12 - br.md"
+  max-short-problem-description-words: 50
+
+system: |
+  You are a helpful and precise AI assistant.
+  Provide clear, accurate, and direct responses to the user's instructions.
+
+prompts:
+  - id: "ShortProblemDescription"
+    template: |
+      Given the following business requirements:
+      {{business-requirements}}
+      
+      Your task is to create a "short problem description" that can be used as a subtitle 
+      using at most {{max-short-problem-description-words}} words.
+    gateway: #tags+
+    plus: null
+
+  - id: "PersonaIdentification"
+    template: |
+      Given the following business requirements:
+      {{business-requirements}}
+      
+      Your task is to identify all personas (types of human users or roles) the described system could interact with.
+      
+      Present first a minimal set of personas the system should support - make sure 
+      that each requirement is linked to at least one persona in this case.
+      
+      Also propose an exhaustive list of personas that the system could support.
+      
+      Response formatting:
+      - list personas as a markdown numbered list
+      - persona names should be rendered in bold and after that add a column and a brief intuitive explanation of that persona (max 10 words)
+      - explain in a sublist why that persona is required linking each explanation to the corresponding requirement
+
+      
+      An example persona rendering output:
+      
+      1. **Role**: brief role description
+        - R3: Role needs to exist because ...
+
+    gateway: #tags+
+    plus: null
