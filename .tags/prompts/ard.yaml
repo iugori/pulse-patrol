@@ -9,15 +9,17 @@ parameters:
 
 defaults:
   business-requirements: "file://docs/2026-01-12 - br.md"
+  external-entities: file://docs/ard-tema2_2026-01-15.md:82-93
   max-short-problem-description-words: 50
-  personas: file://docs/2026-01-15 - adr.md:24-39
+  personas: file://docs/ard-tema2_2026-01-15.md:25-39
+  use-cases: file://docs/ard-tema2_2026-01-15.md:43-83
 
 system: |
   You are a helpful and precise AI assistant.
   Provide clear, accurate, and direct responses to the user's instructions.
 
 prompts:
-  - id: "ShortProblemDescription"
+  - id: "_01_ShortProblemDescription"
     template: |
       Given the following business requirements:
       {{business-requirements}}
@@ -27,7 +29,7 @@ prompts:
     gateway: "#tags+"
     plus: null
 
-  - id: "PersonaIdentification"
+  - id: "_02_PersonaIdentification"
     template: |
       Given the following business requirements:
       {{business-requirements}}
@@ -52,7 +54,7 @@ prompts:
 
     gateway: "#tags+"
 
-  - id: "UseCaseGenerator"
+  - id: "_03_UseCaseGenerator"
     template: |
       Given the following business requirements
       
@@ -71,6 +73,63 @@ prompts:
       Constraints:
       - make sure that all business requirements are covered
       - structure each use case using the following pattern: As a <type of user>, I want <some goal>, so that <some reason/benefit>.
+
+    gateway: "#tags+"
+    plus: null
+
+  - id: "_04_SystemBoundaryIdentification"
+    template: |
+      Given the following business requirements
+      
+      ```business-requirements
+      {{business-requirements}}
+      ```
+      
+      and the following personas
+      
+      ```personas
+      {{personas}}
+      ```
+      
+      and the following use cases
+      
+      ```use-cases
+      {{use-cases}}
+      ```
+      
+      Your task is to exhaustively identify all the separate external entities the system will have to interact to.
+      Consider mainly the external entities that should be present in a Context Diagram (C4 model).
+
+    gateway: "#tags+"
+    plus: null
+
+  - id: "_05_C4_ContextDiagram"
+    template: |
+      Given the following business requirements
+
+      ```business-requirements
+      {{business-requirements}}
+      ```
+
+      and the following use cases
+
+      ```use-cases
+      {{use-cases}}
+      ```
+      
+      and the following external entities
+
+      ```external-entities
+      {{external-entities}}
+      ```
+
+      Your task is to generate a Context Diagram (C4 model) using Mermaid.
+      
+      Constraints:
+      - human actors are **external** to the system
+      - you can use different visual markers / icons for human and non human entities
+      - only render the diagram with nice arrows and labels but without textual explanations
+      
 
     gateway: "#tags+"
     plus: null
