@@ -154,7 +154,7 @@ prompts:
       {{external-entities}}
       ```
 
-      Your task is to identify the deployment units as required ina  Component Diagram (C4 model).
+      Your task is to identify the deployment units as required in a Container Diagram (C4 model).
 
       Suggestions:
       - when creating the deployable units refrain from specifying a certain technology - keep it generic
@@ -162,7 +162,7 @@ prompts:
     gateway: "chat"
     plus: null
 
-  - id: "_07_C4_ComponentDiagram"
+  - id: "_07_C4_ContainerDiagram"
     template: |
       Given the following business requirements
 
@@ -187,7 +187,7 @@ prompts:
       {{deployable-units}}
       ```
 
-      Your task is to generate a Component Diagram (C4 model) using Mermaid.
+      Your task is to generate a Container Diagram (C4 model) using Mermaid.
 
       Suggestions:
       - make sure that all external-entities and all deployable-units appear in the diagram in clear and sensible relations
