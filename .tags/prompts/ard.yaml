@@ -9,10 +9,11 @@ parameters:
 
 defaults:
   business-requirements: "file://docs/2026-01-12 - br.md"
-  external-entities: file://docs/ard-tema2_2026-01-15.md:82-93
+  deployable-units: file://docs/ard-tema2_2026-01-15.md:155-165
+  external-entities: file://docs/ard-tema2_2026-01-15.md:102-115
   max-short-problem-description-words: 50
-  personas: file://docs/ard-tema2_2026-01-15.md:25-39
-  use-cases: file://docs/ard-tema2_2026-01-15.md:43-83
+  personas: file://docs/ard-tema2_2026-01-15.md:48-60
+  use-cases: file://docs/ard-tema2_2026-01-15.md:64-98
 
 system: |
   You are a helpful and precise AI assistant.
@@ -129,7 +130,69 @@ prompts:
       - human actors are **external** to the system
       - you can use different visual markers / icons for human and non human entities
       - only render the diagram with nice arrows and labels but without textual explanations
-      
 
     gateway: "#tags+"
+    plus: null
+
+  - id: "_06_IdentifyDeployableUnits"
+    template: |
+      Given the following business requirements
+
+      ```business-requirements
+      {{business-requirements}}
+      ```
+
+      and the following use cases
+
+      ```use-cases
+      {{use-cases}}
+      ```
+
+      and the following external entities
+
+      ```external-entities
+      {{external-entities}}
+      ```
+
+      Your task is to identify the deployment units as required ina  Component Diagram (C4 model).
+
+      Suggestions:
+      - when creating the deployable units refrain from specifying a certain technology - keep it generic
+
+    gateway: "chat"
+    plus: null
+
+  - id: "_07_C4_ComponentDiagram"
+    template: |
+      Given the following business requirements
+
+      ```business-requirements
+      {{business-requirements}}
+      ```
+
+      and the following use cases
+
+      ```use-cases
+      {{use-cases}}
+      ```
+
+      and the following external entities
+
+      ```external-entities
+      {{external-entities}}
+      ```
+      
+      and the following deployable units
+      ```deployable-units
+      {{deployable-units}}
+      ```
+
+      Your task is to generate a Component Diagram (C4 model) using Mermaid.
+
+      Suggestions:
+      - make sure that all external-entities and all deployable-units appear in the diagram in clear and sensible relations
+      - always add clear action labels to the arrows 
+      - try to group external entities into logical clusters based on the deployable units they are communicating with
+
+    gateway: "chat"
     plus: null
