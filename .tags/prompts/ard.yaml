@@ -9,11 +9,11 @@ parameters:
 
 defaults:
   business-requirements: "file://docs/2026-01-12 - br.md"
-  deployable-units: file://docs/ard-tema2_2026-01-15.md:161-168
-  external-entities: file://docs/ard-tema2_2026-01-15.md:110-121
+  deployable-units: file://docs/2026-01-15 - adr - tema2.md:161-168
+  external-entities: file://docs/2026-01-15 - adr - tema2.md:110-121
   max-short-problem-description-words: 50
-  personas: file://docs/ard-tema2_2026-01-15.md:54-66
-  use-cases: file://docs/ard-tema2_2026-01-15.md:70-104
+  personas: file://docs/2026-01-15 - adr - tema2.md:54-66
+  use-cases: file://docs/2026-01-15 - adr - tema2.md:70-104
 
 system: |
   You are a helpful and precise AI assistant.
