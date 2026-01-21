@@ -9,11 +9,11 @@ parameters:
 
 defaults:
   business-requirements: "file://docs/2026-01-12 - br.md"
-  deployable-units: file://docs/ard-tema2_2026-01-15.md:155-165
-  external-entities: file://docs/ard-tema2_2026-01-15.md:102-115
+  deployable-units: file://docs/ard-tema2_2026-01-15.md:161-168
+  external-entities: file://docs/ard-tema2_2026-01-15.md:110-121
   max-short-problem-description-words: 50
-  personas: file://docs/ard-tema2_2026-01-15.md:48-60
-  use-cases: file://docs/ard-tema2_2026-01-15.md:64-98
+  personas: file://docs/ard-tema2_2026-01-15.md:54-66
+  use-cases: file://docs/ard-tema2_2026-01-15.md:70-104
 
 system: |
   You are a helpful and precise AI assistant.
@@ -58,13 +58,11 @@ prompts:
   - id: "_03_UseCaseGenerator"
     template: |
       Given the following business requirements
-      
       ```business-requirements
       {{business-requirements}}
       ```
       
       and the following personas
-      
       ```personas
       {{personas}}
       ```
@@ -81,19 +79,16 @@ prompts:
   - id: "_04_SystemBoundaryIdentification"
     template: |
       Given the following business requirements
-      
       ```business-requirements
       {{business-requirements}}
       ```
       
       and the following personas
-      
       ```personas
       {{personas}}
       ```
       
       and the following use cases
-      
       ```use-cases
       {{use-cases}}
       ```
@@ -107,19 +102,16 @@ prompts:
   - id: "_05_C4_ContextDiagram"
     template: |
       Given the following business requirements
-
       ```business-requirements
       {{business-requirements}}
       ```
 
       and the following use cases
-
       ```use-cases
       {{use-cases}}
       ```
       
       and the following external entities
-
       ```external-entities
       {{external-entities}}
       ```
@@ -137,19 +129,16 @@ prompts:
   - id: "_06_IdentifyDeployableUnits"
     template: |
       Given the following business requirements
-
       ```business-requirements
       {{business-requirements}}
       ```
 
       and the following use cases
-
       ```use-cases
       {{use-cases}}
       ```
 
       and the following external entities
-
       ```external-entities
       {{external-entities}}
       ```
@@ -165,19 +154,16 @@ prompts:
   - id: "_07_C4_ContainerDiagram"
     template: |
       Given the following business requirements
-
       ```business-requirements
       {{business-requirements}}
       ```
 
       and the following use cases
-
       ```use-cases
       {{use-cases}}
       ```
 
       and the following external entities
-
       ```external-entities
       {{external-entities}}
       ```
@@ -193,6 +179,36 @@ prompts:
       - make sure that all external-entities and all deployable-units appear in the diagram in clear and sensible relations
       - always add clear action labels to the arrows 
       - try to group external entities into logical clusters based on the deployable units they are communicating with
+
+    gateway: "chat"
+    plus: null
+
+  - id: "_08_UseCaseSequenceDiagram"
+    template: |
+      Given the following business requirements
+      ```business-requirements
+      {{business-requirements}}
+      ```
+      
+      and the following personas
+      ```personas
+      {{personas}}
+      ```
+
+      and the following external system entities
+      ```external-entities
+      {{external-entities}}
+      ```
+      
+      and the following deployable units
+      ```deployable-units
+      {{deployable-units}}
+      ```
+
+      Your task is to generate a Sequence Diagram using Mermaid for the following use case:
+      ```use-case
+      {{use-case}}
+      ```
 
     gateway: "chat"
     plus: null
