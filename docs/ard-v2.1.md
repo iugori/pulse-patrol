@@ -177,8 +177,11 @@ hardware, legacy data, and end-users.
 ```mermaid
 graph LR
 %% Actors
-    subgraph Users [Users]
+    subgraph ExternalUsers ["External Users"]
         P(("👤<br/>Patient"))
+    end
+
+    subgraph InternalUsers ["Internal Users"]
         D(("👤<br/>Doctor"))
         S(("👤<br/>Support<br/>Staff"))
         A(("👤<br/>Admin"))
@@ -190,10 +193,13 @@ graph LR
     end
 
 %% Externals
-    subgraph Infrastructure [External Systems]
-        ME["Medical Equip."]
-        IS["Legacy Systems"]
-        EP[/"External Peers"/]
+    subgraph InternalInfrastructure ["Internal Systems"]
+        ME["📠 Medical Equip."]
+        IS["💾 Legacy Systems"]
+    end
+
+    subgraph ExternalInfrastructure ["External Systems"]
+        EP["🌐 External Peers"]
     end
 
 %% Relationships with concise text
@@ -230,26 +236,32 @@ The system will be decomposed into the following functional units:
 
 ```mermaid
 graph TB
-    subgraph External_Actors [Users & Stakeholders]
+    subgraph External_Actors ["External Users"]
         Patient(("👤<br/>Patient"))
+    end
+
+    subgraph Internal_Actors ["Internal Users"]
         Admin(("👤<br/>Admin"))
         Doctor(("👤<br/>Doctor"))
         Support(("👤<br/>Support<br/>Staff"))
     end
 
-    subgraph Pulse_Patrol_System [Pulse Patrol System Boundary]
+    subgraph Pulse_Patrol_System ["🫀 Pulse Patrol System Boundary"]
         Portal[Web Portal]
         Dashboard[Clinical Dashboard]
         PMS[Patient Management<br />Service]
         TAS[Telemetry & Alerting<br />Service]
         Storage[(Data Storage)]
-        Gateway[Integration<br />Gateway]
+        Gateway["Integration Gateway"]
     end
 
-    subgraph External_Systems [External &nbsp Infrastructure &nbsp]
-        Legacy[Legacy Hospital Systems]
-        Equipment[Medical Equipment / IoT]
-        Peer[/Peer Healthcare Companies/]
+    subgraph External_Systems [External Infrastructure]
+        Peer["🌐 Peer Healthcare Companies"]
+    end
+
+    subgraph Internal_Systems [Internal Infrastructure]
+        Equipment["📠 Medical Equipment / IoT"]
+        Legacy["💾 Legacy Hospital Systems"]
     end
 
 %% User Interactions
@@ -268,11 +280,12 @@ graph TB
     PMS -->|Syncs data| Gateway
     TAS -->|Receives streams| Gateway
 %% External System Connections
-    Gateway <-->|ETL/Data sync| Legacy
-    Gateway <---|Real - time telemetry| Equipment
     Gateway <-->|Inter - company transfer| Peer
+    Equipment -->|Real - time telemetry| Gateway
+    Gateway <-->|ETL/Data sync| Legacy
 %% Grouping Styling
     style Pulse_Patrol_System fill: #33aaff, color: #fff, stroke: #333, stroke-width: 2px
+    linkStyle 11,12,13 stroke-dasharray:1
 ```
 
 ### Use Case Realization
@@ -305,7 +318,7 @@ so that **I can provide informed medical care based on their history and current
 
 ```mermaid
 sequenceDiagram
-  actor D as Doctor
+    actor D as Doctor
     participant CD as Clinical Dashboard
     participant PMS as Patient Management Service
     participant TAS as Telemetry & Alerting Service
@@ -477,18 +490,23 @@ Entities interacting with the Pulse Patrol system:
 
 [//]: # (S: <external-entities>)
 
-- *Human Actors*
-    - **Patient** - views personal medical history, test results, and treatment progress via the web portal
-    - **Doctor** - accesses patient data within their hospital and receives critical physiological alerts
-    - **Support Staff Member** - nurses/assistants who receive real-time alerts for abnormal patient monitoring values
-    - **Administrator** - manages records, oversees data integrity, and initiates inter-company patient transfers
-- *External Systems*
-    - **Medical Equipment** - IoT devices and monitoring hardware (e.g., bedside monitors, ventilators) that stream
-      real-time telemetry
-    - **Legacy Hospital Systems** - existing legacy databases or EMRs where admission forms and historical medical
-      records may reside
-    - **External Healthcare Companies Peer** - systems belonging to other providers that receive or send patient data
-      during a transfer
+- Human Actors
+    - *External*
+        - **Patient** - views personal medical history, test results, and treatment progress via the web portal
+    - *Internal*
+        - **Doctor** - accesses patient data within their hospital and receives critical physiological alerts
+        - **Support Staff Member** - nurses/assistants who receive real-time alerts for abnormal patient monitoring
+          values
+        - **Administrator** - manages records, oversees data integrity, and initiates inter-company patient transfers
+- Technical Systems
+    - *External*
+        - **External Healthcare Companies Peer** - systems belonging to other providers that receive or send patient
+          data during a transfer
+    - *Internal*
+        - **Medical Equipment** - IoT devices and monitoring hardware (e.g., bedside monitors, ventilators) that stream
+          real-time telemetry
+        - **Legacy Hospital Systems** - existing legacy databases or EMRs where admission forms and historical medical
+          records may reside
 
 [//]: # (S: </external-entities>)
 
