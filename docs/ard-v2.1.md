@@ -178,28 +178,28 @@ hardware, legacy data, and end-users.
 graph LR
 %% Actors
     subgraph ExternalUsers ["External Users"]
-        P(("👤<br/>Patient"))
+        P(("«person»<br/>👥 Patient&nbsp;"))
     end
 
     subgraph InternalUsers ["Internal Users"]
-        D(("👤<br/>Doctor"))
-        S(("👤<br/>Support<br/>Staff"))
-        A(("👤<br/>Admin"))
+        D(("«person»<br/>👤 Doctor&nbsp;"))
+        S(("«person»<br/>👤 Support&nbsp;<br/>Staff"))
+        A(("«person»<br/>👤 Admin&nbsp;"))
     end
 
 %% Core
     subgraph SystemBoundary [System Boundary]
-        PP[["🫀 Pulse Patrol"]]
+        PP["«software system»<br/>🫀 Pulse Patrol&nbsp;"]
     end
 
 %% Externals
     subgraph InternalInfrastructure ["Internal Systems"]
-        ME["📠 Medical Equip."]
-        IS["💾 Legacy Systems"]
+        ME["«software system»<br/>📠 Medical Equip.&nbsp;"]
+        IS["«software system»<br/>💾 Legacy Systems&nbsp;"]
     end
 
     subgraph ExternalInfrastructure ["External Systems"]
-        EP["🌐 External Peers"]
+        EP["«software system»<br/>🌐 External Peers&nbsp;"]
     end
 
 %% Relationships with concise text
@@ -237,31 +237,31 @@ The system will be decomposed into the following functional units:
 ```mermaid
 graph TB
     subgraph External_Actors ["External Users"]
-        Patient(("👤<br/>Patient"))
+        Patient(("«person»<br/>👥 Patient&nbsp;"))
     end
 
     subgraph Internal_Actors ["Internal Users"]
-        Admin(("👤<br/>Admin"))
-        Doctor(("👤<br/>Doctor"))
-        Support(("👤<br/>Support<br/>Staff"))
+        Admin(("«person»<br/>👤 Admin&nbsp;"))
+        Doctor(("«person»<br/>👤 Doctor&nbsp;"))
+        Support(("«person»<br/>👤 Support&nbsp;<br/>Staff"))
     end
 
-    subgraph Pulse_Patrol_System ["🫀 Pulse Patrol System Boundary"]
-        Portal[Web Portal]
-        Dashboard[Clinical Dashboard]
-        PMS[Patient Management<br />Service]
-        TAS[Telemetry & Alerting<br />Service]
-        Storage[(Data Storage)]
-        Gateway["Integration Gateway"]
+    subgraph Pulse_Patrol_System ["🫀 Pulse Patrol System Boundary&nbsp;"]
+        Portal["«container: TBD»<br/>Web Portal&nbsp;"]
+        Dashboard["«container: TBD»<br/>Clinical Dashboard&nbsp;"]
+        PMS["«container: TBD»<br/>Patient Management&nbsp;<br/>Service"]
+        TAS["«container: TBD»<br/>Telemetry & Alerting&nbsp;<br/>Service"]
+        Storage[("«container: TBD»<br/>Data Storage&nbsp;")]
+        Gateway["«container: TBD»<br/>Integration Gateway&nbsp;"]
     end
 
     subgraph External_Systems [External Infrastructure]
-        Peer["🌐 Peer Healthcare Companies"]
+        Peer["«software system»<br/>🌐 Peer Healthcare Companies&nbsp;"]
     end
 
     subgraph Internal_Systems [Internal Infrastructure]
-        Equipment["📠 Medical Equipment / IoT"]
-        Legacy["💾 Legacy Hospital Systems"]
+        Equipment["«software system»<br/>📠 Medical Equipment / IoT&nbsp;"]
+        Legacy["«software system»<br/>💾 Legacy Hospital Systems&nbsp;"]
     end
 
 %% User Interactions
@@ -285,7 +285,7 @@ graph TB
     Gateway <-->|ETL/Data sync| Legacy
 %% Grouping Styling
     style Pulse_Patrol_System fill: #33aaff, color: #fff, stroke: #333, stroke-width: 2px
-    linkStyle 11,12,13 stroke-dasharray:1
+    linkStyle 11,12,13 stroke-dasharray: 1
 ```
 
 ### Use Case Realization
@@ -298,16 +298,17 @@ so that **I can stay informed about my health status and treatment progress**.
 
 ```mermaid
 sequenceDiagram
-    actor P as Patient
-    participant WP as Web Portal
-    participant PMS as Patient Management Service
-    participant DS as Data Storage
+    actor P as «person»<br/>Patient<br/>
+    participant WP as «container: TBD»<br/>Web Portal
+    participant PMS as «container: TBD»<br/>Patient Management Service
+    participant DS as «container: TBD»<br/>Data Storage
     P ->> WP: Request access to medical records
     WP ->> PMS: Forward request for patient data
-    PMS ->> DS: Retrieve medical records, test results, admission forms
+    PMS ->> DS: Retrieve medical records
     DS -->> PMS: Send medical data
     PMS -->> WP: Provide patient data
-    WP -->> P: Display medical records, test results, admission forms
+    WP -->> P: Display medical records
+
 ```
 
 #### Use Case 2 (Doctor)
@@ -318,11 +319,11 @@ so that **I can provide informed medical care based on their history and current
 
 ```mermaid
 sequenceDiagram
-    actor D as Doctor
-    participant CD as Clinical Dashboard
-    participant PMS as Patient Management Service
-    participant TAS as Telemetry & Alerting Service
-    participant DS as Data Storage
+    actor D as «person»<br/>Doctor<br/>
+    participant CD as «container: TBD»<br/>Clinical Dashboard
+    participant PMS as «container: TBD»<br/>Patient Management Service
+    participant TAS as «container: TBD»<br/>Telemetry & Alerting Service
+    participant DS as «container: TBD»<br/>Data Storage
     D ->> CD: Select Patient Profile
 %% Fetching Medical History
     CD ->> PMS: Get Patient Records (History, Labs, Admissions)
@@ -345,12 +346,12 @@ so that **I can respond quickly to critical patient needs and improve outcomes**
 
 ```mermaid
 sequenceDiagram
-    participant ME as Medical Equipment
-    participant IG as Integration Gateway
-    participant TAS as Telemetry & Alerting Service
-    participant DS as Data Storage
-    participant CD as Clinical Dashboard
-    actor SS as Doctor
+    participant ME as «software system»<br/>📠 Medical Equipment
+    participant IG as «container: TBD»<br/>Integration Gateway
+    participant TAS as «container: TBD»<br/>Telemetry & Alerting Service
+    participant DS as «container: TBD»<br/>Data Storage
+    participant CD as «container: TBD»<br/>Clinical Dashboard
+    actor SS as «person»<br/>Doctor<br/>
     Note over ME, SS: Real-time Monitoring & Alerting Flow
     ME ->> IG: Stream real-time telemetry data
     IG ->> TAS: Forward data stream
@@ -380,12 +381,12 @@ so that **I can act swiftly to provide necessary medical assistance and ensure p
 
 ```mermaid
 sequenceDiagram
-    participant ME as Medical Equipment
-    participant IG as Integration Gateway
-    participant TAS as Telemetry & Alerting Service
-    participant DS as Data Storage
-    participant CD as Clinical Dashboard
-    actor D as Support Staff
+    participant ME as «software system»<br/>📠 Medical Equipment
+    participant IG as «container: TBD»<br/>Integration Gateway
+    participant TAS as «container: TBD»<br/>Telemetry & Alerting Service
+    participant DS as «container: TBD»<br/>Data Storage
+    participant CD as «container: TBD»<br/>Clinical Dashboard
+    actor D as «person»<br/>Support Staff<br/>
     Note over ME, D: Real-time Patient Monitoring Flow
     ME ->> IG: Stream Telemetry Data (e.g., Heart Rate, SpO2)
     IG ->> TAS: Forward Raw Data Stream
@@ -412,12 +413,12 @@ so that **I can maintain accurate and up-to-date information for efficient healt
 
 ```mermaid
 sequenceDiagram
-    actor Admin as Admin
-    participant Portal as Web Portal
-    participant PMS as Patient Management Service
-    participant Storage as Data Storage
-    participant Gateway as Integration Gateway
-    participant Legacy as Legacy Hospital Systems
+    actor Admin as «person»<br/>Admin<br/>
+    participant Portal as «container: TBD»<br/>Web Portal
+    participant PMS as «container: TBD»<br/>Patient Management Service
+    participant Storage as «container: TBD»<br/>Data Storage
+    participant Gateway as «container: TBD»<br/>Integration Gateway
+    participant Legacy as «software system»<br/>📠 Legacy Hospital Systems
     Admin ->> Portal: Access Patient Record
     Portal ->> PMS: Request Patient Data
     PMS ->> Storage: Fetch Record
@@ -448,12 +449,12 @@ so that **I can ensure continuity of care and proper handling of patient data**.
 
 ```mermaid
 sequenceDiagram
-    actor Admin as Admin
-    participant Portal as Web Portal
-    participant PMS as Patient Management Service
-    participant Storage as Data Storage
-    participant Gateway as Integration Gateway
-    participant Peer as Peer Healthcare Company
+    actor Admin as «person»<br/>Admin<br/>
+    participant Portal as «container: TBD»<br/>Web Portal
+    participant PMS as «container: TBD»<br/>Patient Management Service
+    participant Storage as «container: TBD»<br/>Data Storage
+    participant Gateway as «container: TBD»<br/>Integration Gateway
+    participant Peer as «software system»<br/>🌐 Peer Healthcare Company
     Note over Admin, Peer: Use Case: Transfer Patient to Another Company
     Admin ->> Portal: Select patient and target healthcare provider
     Portal ->> PMS: InitiateTransfer(patientId, targetCompanyId)
