@@ -176,42 +176,56 @@ hardware, legacy data, and end-users.
 
 ```mermaid
 graph LR
-%% Actors
-    subgraph ExternalUsers ["External Users"]
-        P(("«person»<br/>👥 Patient&nbsp;"))
+    classDef depExt fill: #f8a3a3, stroke: #333, stroke-width: 1.5px;
+    classDef depInt fill: #a8e6a1, stroke: #333, stroke-width: 1.5px;
+    classDef theSys fill: #92c6ff, stroke: #333, stroke-width: 1.5px;
+    classDef groups fill: #f8f8f8, stroke: #333, stroke-width: 1.5px;
+    subgraph Legend [Legend]
+        direction TB
+        L1["External Dependency"]:::depExt
+        L2["Internal Dependency"]:::depInt
+        L3["Core System"]:::theSys
     end
+    subgraph Diagram ["Context Diagram"]
+        direction LR
+    %% Actors
+        subgraph ExternalUsers ["External Users"]
+            P(("«person»<br/>👥 Patient&nbsp;")):::depExt
+        end
 
-    subgraph InternalUsers ["Internal Users"]
-        D(("«person»<br/>👤 Doctor&nbsp;"))
-        S(("«person»<br/>👤 Support&nbsp;<br/>Staff"))
-        A(("«person»<br/>👤 Admin&nbsp;"))
+        subgraph InternalUsers ["Internal Users"]
+            D(("«person»<br/>👤 Doctor&nbsp;")):::depInt
+            S(("«person»<br/>👤 Support&nbsp;<br/>Staff")):::depInt
+            A(("«person»<br/>👤 Admin&nbsp;")):::depInt
+        end
+
+    %% Core
+        PP["«software system»<br/>🫀 Pulse Patrol&nbsp;"]:::theSys
+    %% Externals
+        subgraph InternalInfrastructure ["Internal Systems"]
+            ME["«software system»<br/>📠 Medical Equip.&nbsp;"]:::depInt
+            IS["«software system»<br/>💾 Legacy Systems&nbsp;"]:::depInt
+        end
+
+        subgraph ExternalInfrastructure ["External Systems"]
+            EP["«software system»<br/>🌐 External Peers&nbsp;"]:::depExt
+        end
+
+    %% Relationships with concise text
+        P -- Accesses records --> PP
+        D -- Monitors & Alerts --> PP
+        S -- Receives Alerts --> PP
+        A -- Manages Transfers --> PP
+        PP -- Ingests data from --> ME
+        PP <-- Syncs data --> IS
+        PP <-- Exchanges data --> EP
+
     end
-
-%% Core
-    subgraph SystemBoundary [System Boundary]
-        PP["«software system»<br/>🫀 Pulse Patrol&nbsp;"]
-    end
-
-%% Externals
-    subgraph InternalInfrastructure ["Internal Systems"]
-        ME["«software system»<br/>📠 Medical Equip.&nbsp;"]
-        IS["«software system»<br/>💾 Legacy Systems&nbsp;"]
-    end
-
-    subgraph ExternalInfrastructure ["External Systems"]
-        EP["«software system»<br/>🌐 External Peers&nbsp;"]
-    end
-
-%% Relationships with concise text
-    P -- Accesses records --> PP
-    D -- Monitors & Alerts --> PP
-    S -- Receives Alerts --> PP
-    A -- Manages Transfers --> PP
-    PP -- Ingests data --> ME
-    PP -- Syncs data --> IS
-    PP -- Exchanges data --> EP
-%% Style
-    style PP fill: #33aaff, color: #fff, stroke: #333, stroke-width: 2px
+%% Styles
+    class ExternalUsers groups
+    class InternalUsers groups
+    class InternalInfrastructure groups
+    class ExternalInfrastructure groups
 ```
 
 ## 3. Individual Components Roles and Responsibilities
@@ -236,34 +250,40 @@ The system will be decomposed into the following functional units:
 
 ```mermaid
 graph TB
-    subgraph External_Actors ["External Users"]
-        Patient(("«person»<br/>👥 Patient&nbsp;"))
+    classDef depExt fill: #f8a3a3, stroke: #333, stroke-width: 1.5px;
+    classDef depInt fill: #a8e6a1, stroke: #333, stroke-width: 1.5px;
+    classDef theSys fill: white, stroke: #333, stroke-width: 1.5px;
+    classDef container fill: #92c6ff, stroke: #333, stroke-width: 1.5px;
+    subgraph Legend [Legend]
+        direction TB
+        L1["External Dependency"]:::depExt
+        L2["Internal Dependency"]:::depInt
+        L3["Core System"]:::theSys
+        L4["Container"]:::container
     end
+    Diagram --- Legend
+    linkStyle 0 stroke-width:0px;
+    
+    subgraph Diagram ["Container Diagram"]
+        direction TB
+        Patient(("«person»<br/>👥 Patient&nbsp;")):::depExt
+        Admin(("«person»<br/>👤 Admin&nbsp;")):::depInt
+        Doctor(("«person»<br/>👤 Doctor&nbsp;")):::depInt
+        Support(("«person»<br/>👤 Support&nbsp;<br/>Staff")):::depInt
 
-    subgraph Internal_Actors ["Internal Users"]
-        Admin(("«person»<br/>👤 Admin&nbsp;"))
-        Doctor(("«person»<br/>👤 Doctor&nbsp;"))
-        Support(("«person»<br/>👤 Support&nbsp;<br/>Staff"))
+        subgraph Pulse_Patrol_System ["«software system» 🫀 Pulse Patrol System Boundary&nbsp;"]
+            Portal["«container: TBD»<br/>Web Portal&nbsp;"]:::container
+            Dashboard["«container: TBD»<br/>Clinical Dashboard&nbsp;"]:::container
+            PMS["«container: TBD»<br/>Patient Management&nbsp;<br/>Service"]:::container
+            TAS["«container: TBD»<br/>Telemetry & Alerting&nbsp;<br/>Service"]:::container
+            Storage[("«container: TBD»<br/>Data Storage&nbsp;")]:::container
+            Gateway["«container: TBD»<br/>Integration Gateway&nbsp;"]:::container
+        end
+
+        Peer["«software system»<br/>🌐 Peer Healthcare Companies&nbsp;"]:::depExt
+        Equipment["«software system»<br/>📠 Medical Equipment / IoT&nbsp;"]:::depInt
+        Legacy["«software system»<br/>💾 Legacy Hospital Systems&nbsp;"]:::depInt
     end
-
-    subgraph Pulse_Patrol_System ["🫀 Pulse Patrol System Boundary&nbsp;"]
-        Portal["«container: TBD»<br/>Web Portal&nbsp;"]
-        Dashboard["«container: TBD»<br/>Clinical Dashboard&nbsp;"]
-        PMS["«container: TBD»<br/>Patient Management&nbsp;<br/>Service"]
-        TAS["«container: TBD»<br/>Telemetry & Alerting&nbsp;<br/>Service"]
-        Storage[("«container: TBD»<br/>Data Storage&nbsp;")]
-        Gateway["«container: TBD»<br/>Integration Gateway&nbsp;"]
-    end
-
-    subgraph External_Systems [External Infrastructure]
-        Peer["«software system»<br/>🌐 Peer Healthcare Companies&nbsp;"]
-    end
-
-    subgraph Internal_Systems [Internal Infrastructure]
-        Equipment["«software system»<br/>📠 Medical Equipment / IoT&nbsp;"]
-        Legacy["«software system»<br/>💾 Legacy Hospital Systems&nbsp;"]
-    end
-
 %% User Interactions
     Patient -->|Views records| Portal
     Admin -->|Manages data & transfers| Portal
@@ -284,8 +304,9 @@ graph TB
     Equipment -->|Real - time telemetry| Gateway
     Gateway <-->|ETL/Data sync| Legacy
 %% Grouping Styling
+    class Pulse_Patrol_System theSys
     style Pulse_Patrol_System fill: #33aaff, color: #fff, stroke: #333, stroke-width: 2px
-    linkStyle 11,12,13 stroke-dasharray: 1
+    
 ```
 
 ### Use Case Realization
