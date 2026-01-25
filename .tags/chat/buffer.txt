@@ -1,0 +1,10 @@
+    classDef depExt fill: #f8a3a3, stroke: #333, stroke-width: 1.5px;
+    classDef depInt fill: #a8e6a1, stroke: #333, stroke-width: 1.5px;
+    classDef theSys fill: #92c6ff, stroke: #333, stroke-width: 1.5px;
+    classDef groups fill: #f8f8f8, stroke: #333, stroke-width: 1.5px;
+    subgraph Legend [Legend]
+        direction TB
+        L1["External Dependency"]:::depExt
+        L2["Internal Dependency"]:::depInt
+        L3["Core System"]:::theSys
+    end

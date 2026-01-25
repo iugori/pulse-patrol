@@ -40,6 +40,12 @@
   * [4. Deployment](#4-deployment)
   * [5. Dependencies](#5-dependencies)
   * [6. Data Flows/APIs](#6-data-flowsapis)
+    * [Bounded Contexts](#bounded-contexts)
+      * [Care Coordination & Admissions](#care-coordination--admissions)
+      * [Clinical Records](#clinical-records)
+      * [Vital Signs & Monitoring](#vital-signs--monitoring)
+      * [Notification & Alerting](#notification--alerting)
+      * [Security & Audit (Generic)](#security--audit-generic)
   * [7. Security Concerns](#7-security-concerns)
   * [8. COGS](#8-cogs)
 <!-- TOC -->
@@ -125,7 +131,6 @@ so that **I can ensure continuity of care and proper handling of patient data**.
 
 [//]: # (S: </use-cases>)
 
-
 #### Data Sources and Particularities
 
 [//]: # (S: <data-sources>)
@@ -148,7 +153,8 @@ machine-readable exports while maintaining the integrity of real-time equipment 
 ##### Electronic Health Records (EHR) & Admission Forms
 
 - *Source:* Manual entry by Administrators/Support Staff and historical records.
-- *Legal Owner:* Usually the Healthcare Provider (Hospital/Clinic) where the data was generated, though patients hold rights to access and portability.
+- *Legal Owner:* Usually the Healthcare Provider (Hospital/Clinic) where the data was generated, though patients hold
+  rights to access and portability.
 
 ##### Medical Equipment Telemetry (Real-time Monitoring)
 
@@ -171,7 +177,6 @@ machine-readable exports while maintaining the integrity of real-time equipment 
 - *Legal Owner:* The Healthcare Software Operator/Company.
 
 [//]: # (S: </data-sources>)
-
 
 ### Out of Scope
 
@@ -200,7 +205,6 @@ The following items are explicitly excluded from the current architectural desig
   primary creation or physical verification of government-issued identities for patients.
 
 [//]: # (S: </out-of-scope>)
-
 
 ## 2. Proposed Approach
 
@@ -300,8 +304,8 @@ The system will be decomposed into the following functional units:
 - **Web Portal**: Interface for Patients to view records and for Administrators to manage data.
 - **Clinical Dashboard**: Specialized interface for Doctors and Support Staff to monitor live telemetry and patient
   data.
-- **Patient Management Service**: Core logic for medical records, admission forms, and inter-company transfers.
-- **Telemetry & Alerting Service**: Processes real-time data from medical equipment and triggers notifications for
+- **Patient Management Services**: Core logic for medical records, admission forms, and inter-company transfers.
+- **Telemetry & Alerting Services**: Processes real-time data from medical equipment and triggers notifications for
   abnormal values.
 - **Data Storage**: Centralized repository for structured medical records and time-series telemetry data.
 - **Integration Gateway**: Handles communication with Legacy Systems, Medical Equipment, and Peer Healthcare Companies.
@@ -321,9 +325,7 @@ graph TB
         L3["Core System"]:::theSys
         L4["Container"]:::container
     end
-    Diagram --- Legend
-    linkStyle 0 stroke-width:0px;
-    
+    Diagram ~~~ Legend
     subgraph Diagram ["Container Diagram"]
         direction TB
         Patient(("«person»<br/>👥 Patient&nbsp;")):::depExt
@@ -332,12 +334,12 @@ graph TB
         Support(("«person»<br/>👤 Support&nbsp;<br/>Staff")):::depInt
 
         subgraph Pulse_Patrol_System ["«software system» 🫀 Pulse Patrol System Boundary&nbsp;"]
-            Portal["«container: TBD»<br/>Web Portal&nbsp;"]:::container
-            Dashboard["«container: TBD»<br/>Clinical Dashboard&nbsp;"]:::container
-            PMS["«container: TBD»<br/>Patient Management&nbsp;<br/>Service"]:::container
-            TAS["«container: TBD»<br/>Telemetry & Alerting&nbsp;<br/>Service"]:::container
-            Storage[("«container: TBD»<br/>Data Storage&nbsp;")]:::container
-            Gateway["«container: TBD»<br/>Integration Gateway&nbsp;"]:::container
+            Portal["«container»<br/>Web Portal&nbsp;"]:::container
+            Dashboard["«container»<br/>Clinical Dashboard&nbsp;"]:::container
+            PMS["«container»<br/>Patient Management&nbsp;<br/>Services"]:::container
+            TAS["«container»<br/>Telemetry & Alerting&nbsp;<br/>Services"]:::container
+            Storage[("«container»<br/>Data Storage&nbsp;")]:::container
+            Gateway["«container»<br/>Integration Gateway&nbsp;"]:::container
         end
 
         Peer["«software system»<br/>🌐 Peer Healthcare Companies&nbsp;"]:::depExt
@@ -366,7 +368,7 @@ graph TB
 %% Grouping Styling
     class Pulse_Patrol_System theSys
     style Pulse_Patrol_System fill: #33aaff, color: #fff, stroke: #333, stroke-width: 2px
-    
+
 ```
 
 ### Use Case Realization
@@ -380,9 +382,9 @@ so that **I can stay informed about my health status and treatment progress**.
 ```mermaid
 sequenceDiagram
     actor P as «person»<br/>Patient<br/>
-    participant WP as «container: TBD»<br/>Web Portal
-    participant PMS as «container: TBD»<br/>Patient Management Service
-    participant DS as «container: TBD»<br/>Data Storage
+    participant WP as «container»<br/>Web Portal
+    participant PMS as «container»<br/>Patient Management Services
+    participant DS as «container»<br/>Data Storage
     P ->> WP: Request access to medical records
     WP ->> PMS: Forward request for patient data
     PMS ->> DS: Retrieve medical records
@@ -401,10 +403,10 @@ so that **I can provide informed medical care based on their history and current
 ```mermaid
 sequenceDiagram
     actor D as «person»<br/>Doctor<br/>
-    participant CD as «container: TBD»<br/>Clinical Dashboard
-    participant PMS as «container: TBD»<br/>Patient Management Service
-    participant TAS as «container: TBD»<br/>Telemetry & Alerting Service
-    participant DS as «container: TBD»<br/>Data Storage
+    participant CD as «container»<br/>Clinical Dashboard
+    participant PMS as «container»<br/>Patient Management Services
+    participant TAS as «container»<br/>Telemetry & Alerting Services
+    participant DS as «container»<br/>Data Storage
     D ->> CD: Select Patient Profile
 %% Fetching Medical History
     CD ->> PMS: Get Patient Records (History, Labs, Admissions)
@@ -428,10 +430,10 @@ so that **I can respond quickly to critical patient needs and improve outcomes**
 ```mermaid
 sequenceDiagram
     participant ME as «software system»<br/>📠 Medical Equipment
-    participant IG as «container: TBD»<br/>Integration Gateway
-    participant TAS as «container: TBD»<br/>Telemetry & Alerting Service
-    participant DS as «container: TBD»<br/>Data Storage
-    participant CD as «container: TBD»<br/>Clinical Dashboard
+    participant IG as «container»<br/>Integration Gateway
+    participant TAS as «container»<br/>Telemetry & Alerting Services
+    participant DS as «container»<br/>Data Storage
+    participant CD as «container»<br/>Clinical Dashboard
     actor SS as «person»<br/>Doctor<br/>
     Note over ME, SS: Real-time Monitoring & Alerting Flow
     ME ->> IG: Stream real-time telemetry data
@@ -463,10 +465,10 @@ so that **I can act swiftly to provide necessary medical assistance and ensure p
 ```mermaid
 sequenceDiagram
     participant ME as «software system»<br/>📠 Medical Equipment
-    participant IG as «container: TBD»<br/>Integration Gateway
-    participant TAS as «container: TBD»<br/>Telemetry & Alerting Service
-    participant DS as «container: TBD»<br/>Data Storage
-    participant CD as «container: TBD»<br/>Clinical Dashboard
+    participant IG as «container»<br/>Integration Gateway
+    participant TAS as «container»<br/>Telemetry & Alerting Services
+    participant DS as «container»<br/>Data Storage
+    participant CD as «container»<br/>Clinical Dashboard
     actor D as «person»<br/>Support Staff<br/>
     Note over ME, D: Real-time Patient Monitoring Flow
     ME ->> IG: Stream Telemetry Data (e.g., Heart Rate, SpO2)
@@ -495,10 +497,10 @@ so that **I can maintain accurate and up-to-date information for efficient healt
 ```mermaid
 sequenceDiagram
     actor Admin as «person»<br/>Admin<br/>
-    participant Portal as «container: TBD»<br/>Web Portal
-    participant PMS as «container: TBD»<br/>Patient Management Service
-    participant Storage as «container: TBD»<br/>Data Storage
-    participant Gateway as «container: TBD»<br/>Integration Gateway
+    participant Portal as «container»<br/>Web Portal
+    participant PMS as «container»<br/>Patient Management Services
+    participant Storage as «container»<br/>Data Storage
+    participant Gateway as «container»<br/>Integration Gateway
     participant Legacy as «software system»<br/>📠 Legacy Hospital Systems
     Admin ->> Portal: Access Patient Record
     Portal ->> PMS: Request Patient Data
@@ -531,10 +533,10 @@ so that **I can ensure continuity of care and proper handling of patient data**.
 ```mermaid
 sequenceDiagram
     actor Admin as «person»<br/>Admin<br/>
-    participant Portal as «container: TBD»<br/>Web Portal
-    participant PMS as «container: TBD»<br/>Patient Management Service
-    participant Storage as «container: TBD»<br/>Data Storage
-    participant Gateway as «container: TBD»<br/>Integration Gateway
+    participant Portal as «container»<br/>Web Portal
+    participant PMS as «container»<br/>Patient Management Services
+    participant Storage as «container»<br/>Data Storage
+    participant Gateway as «container»<br/>Integration Gateway
     participant Peer as «software system»<br/>🌐 Peer Healthcare Company
     Note over Admin, Peer: Use Case: Transfer Patient to Another Company
     Admin ->> Portal: Select patient and target healthcare provider
@@ -595,6 +597,291 @@ Entities interacting with the Pulse Patrol system:
 ## 6. Data Flows/APIs
 
 [//]: # (<<Data flow diagrams. Definitions of component’s APIs>>)
+
+### Bounded Contexts
+
+#### Care Coordination & Admissions
+
+This context manages the lifecycle of a patient’s presence within a healthcare facility and the handover of
+responsibility between organizations. It acts as the system’s "entry and exit" gatekeeper, ensuring that every patient
+is correctly identified and that their care journey remains continuous when moving between peer providers.
+
+*Events*
+
+- *PatientAdmitted*: An individual is officially registered in a hospital facility.
+- *TransferRequestSent*: Data export was triggered for an external provider.
+- *TransferRequestReceived*: Data export was triggered from an external provider.
+- *TransferAcknowledged*: The receiving company confirmed receipt of patient data (triggered).
+
+*Entities*
+
+- Patient - the main patient record (identification, demographics, etc.)
+- Peer - information about a peer healthcare facility
+- MedicalSnapshot - a bundle of information sent / received to / from peer (possibly binary data)
+
+*Aggregates*
+
+- Admission - information for each patient admission
+- Transfer - information for each patient transfer
+
+```mermaid
+graph TD
+    classDef aggregate rx: 50, ry: 50, fill: LightSkyBlue, stroke: #333, stroke-width: 1.5px;
+    classDef boundedContext rx: 100, ry: 50, color: white, fill: MidnightBlue, stroke: #333, stroke-width: 1.5px;
+    classDef entityValue fill: LightGreen, stroke: #333, stroke-width: 1.5px;
+    subgraph Legend [Legend]
+        direction TB
+        L1["Bounded Context"]:::boundedContext
+        L2["Aggregate"]:::aggregate
+        L3["Entity / Value Object"]:::entityValue
+    end
+    CCA ~~~ Legend
+
+    subgraph CCA ["Care Coordination & Admissions"]
+        subgraph Admission ["«aggregate»"]
+            direction TB
+            AdmissionRoot["«root»<br/>Admission"]:::entityValue
+            AdmissionPatient["«valueObject»<br/>PatientID"]:::entityValue
+            AdmissionDate["«valueObject»<br/>AdmissionDate"]:::entityValue
+            AdmissionRoot ---> AdmissionPatient
+            AdmissionRoot --> AdmissionDate
+        end
+
+        subgraph Transfer ["«aggregate»"]
+            direction TB
+            TransferRoot["«root»<br/>Transfer"]:::entityValue
+            TransferPatient["«valueObject»<br/>PatientID"]:::entityValue
+            TransferPeer["«valueObject»<br/>PeerID"]:::entityValue
+            TransferMedicalSnapshot["«valueObject»<br/>MedicalSnapshotID"]:::entityValue
+            TransferDate["«valueObject»<br/>TransferDate"]:::entityValue
+            TransferRoot ---> TransferPatient
+            TransferRoot ---> TransferPeer
+            TransferRoot ---> TransferMedicalSnapshot
+            TransferRoot --> TransferDate
+        end
+
+        Patient["«entity»<br/>Patient"]:::entityValue
+        Peer["«entity»<br/>Peer"]:::entityValue
+        MedicalSnapshot["«entity»<br/>MedicalSnapshot"]:::entityValue
+        Admission ~~~ Patient
+        Transfer ~~~ Peer
+        Transfer ~~~ MedicalSnapshot
+    end
+%% Styling to make the subgraph look like an oval/capsule
+    class CCA boundedContext
+    class Admission aggregate
+    class Transfer aggregate
+```
+
+#### Clinical Records
+
+This context serves as the authoritative source of truth for a patient's medical history. It manages the lifecycle and
+integrity of static clinical data, ensuring that both patients and providers have a consistent view of health progress.
+
+*Events*
+
+- *MedicalRecordUpdated*: Changes to clinical history were successfully persisted.
+- *TestResultPublished*: Laboratory results were made available for viewing.
+- *RecordAccessed*: An authorized person viewed a specific clinical document.
+
+*Entities*
+
+- PatientProfile - a local representation of the patient’s clinical identity
+- StaffMemberProfile - a local representation for each concerned staff member
+- MedicalHistoryEntry - individual entries such as diagnoses, procedures, or allergies
+- TestResult - the actual data (e.g., "Glucose: 100 mg/dL").
+- ReportMetadata - details about the performing lab, timestamps, and the ordering physician
+
+*Aggregates*
+
+- ClinicalRecord - ensures that all medical documentation is tied to a specific patient and hospital context
+- LabResult - handles the specific complexities of diagnostic data coming from the Laboratory Information Systems
+
+```mermaid
+graph TD
+    classDef aggregate rx: 50, ry: 50, fill: LightSkyBlue, stroke: #333, stroke-width: 1.5px;
+    classDef boundedContext rx: 100, ry: 50, color: white, fill: MidnightBlue, stroke: #333, stroke-width: 1.5px;
+    classDef entityValue fill: LightGreen, stroke: #333, stroke-width: 1.5px;
+    subgraph Legend [Legend]
+        direction TB
+        L1["Bounded Context"]:::boundedContext
+        L2["Aggregate"]:::aggregate
+        L3["Entity / Value Object"]:::entityValue
+    end
+    CR ~~~ Legend
+
+    subgraph CR ["Clinical Records"]
+        direction TB
+
+        subgraph ClinicalRecord ["«aggregate»"]
+            direction TB
+            ClinicalRecordRoot["«root»<br/>ClinicalRecord"]:::entityValue
+            ClinicalRecordPatient["«valueObject»<br/>PatientID"]:::entityValue
+            ClinicalRecordHistoryEntry["«valueObject»<br/>MedicalHistoryEntryID"]:::entityValue
+            ClinicalRecordRoot --> ClinicalRecordPatient
+            ClinicalRecordRoot --> ClinicalRecordHistoryEntry
+            LabResultRoot["«aggregate»<br/>LabResult"]:::aggregate
+            LabResultTestResult["«valueObject»<br/>TestResultID"]:::entityValue
+            LabResultReportMetadata["«valueObject»<br/>ReportMetadataID"]:::entityValue
+            LabResultStaffMemberProfile["«valueObject»<br/>StaffMemberProfileID"]:::entityValue
+            LabResultRoot --> LabResultTestResult
+            LabResultRoot --> LabResultReportMetadata
+            LabResultRoot --> LabResultStaffMemberProfile
+            ClinicalRecordRoot ---> LabResultRoot
+        end
+
+        PatientProfile["«entity»<br/>PatientProfile"]:::entityValue
+        MedicalHistoryEntry["«entity»<br/>MedicalHistoryEntry"]:::entityValue
+        StaffMemberProfile["«entity»<br/>StaffMemberProfile"]:::entityValue
+        TestResult["«entity»<br/>TestResult"]:::entityValue
+        ReportMetadata["«entity»<br/>ReportMetadata"]:::entityValue
+    %% Layout anchors
+        ClinicalRecord ~~~ PatientProfile
+        ClinicalRecord ~~~ TestResult
+        ClinicalRecord ~~~ StaffMemberProfile
+        ClinicalRecord ~~~ MedicalHistoryEntry
+        ClinicalRecord ~~~ ReportMetadata
+    end
+
+    class CR boundedContext
+    class ClinicalRecord aggregate
+```
+
+#### Vital Signs & Monitoring
+
+Description This context is responsible for the continuous ingestion and evaluation of real-time physiological data
+(telemetry) from medical devices. It acts as the system’s "nervous system," observing incoming streams to identify
+critical changes in a patient’s state. Its primary role is to distinguish between normal physiological patterns and
+urgent clinical deviations or technical failures.
+
+*Events*
+
+- *AbnormalValueDetected*: A vital sign breached a predefined safety threshold.
+- *EquipmentDisconnected*: The data stream from the device was lost.
+
+*Entities*
+
+- MedicalDevice - represents the physical hardware (e.g., Bedside Monitor ID)
+- VitalSignReading - a single data point (value, unit, timestamp)
+- ThresholdConfig the defined "safe" ranges for a specific patient
+
+*Aggregates*
+
+- MonitoringSession - binds a Patient to a MedicalDevice for a specific duration
+
+```mermaid
+graph TD
+    classDef aggregate rx: 50, ry: 50, fill: LightSkyBlue, stroke: #333, stroke-width: 1.5px;
+    classDef boundedContext rx: 100, ry: 50, color: white, fill: MidnightBlue, stroke: #333, stroke-width: 1.5px;
+    classDef entityValue fill: LightGreen, stroke: #333, stroke-width: 1.5px;
+    subgraph Legend [Legend]
+        direction TB
+        L1["Bounded Context"]:::boundedContext
+        L2["Aggregate"]:::aggregate
+        L3["Entity / Value Object"]:::entityValue
+    end
+    VSM ~~~ Legend
+
+    subgraph VSM ["Vital Signs & Monitoring"]
+        direction TB
+
+        subgraph MonitoringSession ["«aggregate»"]
+            direction TB
+            MonitoringSessionRoot["«root»<br/>MonitoringSession"]:::entityValue
+            MonitoringSessionMedicalDevice["«valueObject»<br/>MedicalDeviceID"]:::entityValue
+            MonitoringSessionVitalSignReading["«valueObject»<br/>VitalSignReadingID"]:::entityValue
+            MonitoringSessionThresholdConfig["«valueObject»<br/>ThresholdConfigID"]:::entityValue
+            MonitoringSessionRoot --> MonitoringSessionMedicalDevice
+            MonitoringSessionRoot --> MonitoringSessionVitalSignReading
+            MonitoringSessionRoot --> MonitoringSessionThresholdConfig
+        end
+
+        MedicalDevice["«entity»<br/>MedicalDevice"]:::entityValue
+        VitalSignReading["«entity»<br/>VitalSignReading"]:::entityValue
+        ThresholdConfig["«entity»<br/>ThresholdConfig"]:::entityValue
+    %% Layout anchors
+        MonitoringSession ~~~ MedicalDevice
+        MonitoringSession ~~~ VitalSignReading
+        MonitoringSession ~~~ ThresholdConfig
+    end
+
+    class VSM boundedContext
+    class MonitoringSession aggregate
+```
+
+#### Notification & Alerting
+
+This context is responsible for the lifecycle of a notification, from the moment a telemetry threshold is breached to
+the final acknowledgment by a human operator. It decouples the detection of a medical issue from the delivery of the
+message.
+
+*Events*
+
+- *AlertTriggered*: A notification was created based on abnormal vitals.
+- *StaffNotified*: The alert was successfully delivered to a device.
+- *AlertAcknowledged*: A medical professional responded to the notification.
+
+*Entities*
+
+- Recipient - a projection of the Staff member (from the Identity/Staff context) containing their active device tokens
+  and availability status
+- NotificationChannel - represents the medium used to reach staff (e.g., Push Notification, SMS, Dashboard Popup)
+
+*Aggregates*
+
+- Alert - the central record of a specific abnormal event. It tracks the severity, the source (Patient/Device), and the
+  current state (Triggered, Notified, Acknowledged)
+
+```mermaid
+graph TD
+    classDef aggregate rx: 50, ry: 50, fill: LightSkyBlue, stroke: #333, stroke-width: 1.5px;
+    classDef boundedContext rx: 100, ry: 50, color: white, fill: MidnightBlue, stroke: #333, stroke-width: 1.5px;
+    classDef entityValue fill: LightGreen, stroke: #333, stroke-width: 1.5px;
+    subgraph Legend [Legend]
+        direction TB
+        L1["Bounded Context"]:::boundedContext
+        L2["Aggregate"]:::aggregate
+        L3["Entity / Value Object"]:::entityValue
+    end
+    NA ~~~ Legend
+
+    subgraph NA ["Notification & Alerting"]
+        direction TB
+
+        subgraph Alert ["«aggregate»"]
+            direction TB
+            AlertRoot["«root»<br/>Alert"]:::entityValue
+            AlertRecipient["«valueObject»<br/>RecipientID"]:::entityValue
+            AlertNotificationChannel["«valueObject»<br/>NotificationChannelID"]:::entityValue
+            AlertMessage["«valueObject»<br/>Message"]:::entityValue
+            AlertRoot ---> AlertRecipient
+            AlertRoot ---> AlertNotificationChannel
+            AlertRoot --> AlertMessage
+        end
+
+        Recipient["«entity»<br/>Recipient"]:::entityValue
+        NotificationChannel["«entity»<br/>NotificationChannel"]:::entityValue
+    %% Layout anchors
+        Alert ~~~ Recipient
+        Alert ~~~ NotificationChannel
+    end
+
+    class NA boundedContext
+    class Alert aggregate
+```
+
+#### Security & Audit (Generic)
+
+<u>
+This section is added as a reminder.
+More details will be added after security module will be researched in detail.
+</u>
+
+*Events*
+
+- *AccessGranted*: Permission was successfully verified for a data request.
+- *UnauthorizedAccessDetected*: A security breach attempt was recognized.
+- ...
 
 ## 7. Security Concerns
 

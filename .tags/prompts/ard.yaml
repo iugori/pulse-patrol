@@ -248,3 +248,38 @@ prompts:
 
     gateway: "chat"
     plus: null
+
+  - id: "_10_EventStorming"
+    template: |
+      Given the following business requirements:
+      ```business-requirements
+      {{business-requirements}}
+      ```
+      
+      and the following personas:
+      ```personas
+      {{personas}}
+      ```
+
+      and the following use cases:
+      ```use-cases
+      {{use-cases}}
+      ```
+
+      and the following data sources:
+      ```data sources
+      {{data-sources}}
+      ```
+      
+      Your task is to simulate an Event Storming session (as suggested for filling an Architecture Response Document).
+      
+      Important:
+      - this is a brainstorming session don't censor yourself too much
+      - suggest as many commands, events, entities as your context window allows (within reason)
+      - attempt to assign each command / event / entity to a domain
+      - fell also free to use the same word with different meanings if it could be assigned to multiple domains
+      - provide a brief explanation (up to 10 words) for each command / event / entity
+      - do differentiate between each type of command / event / entity
+      - format them as a domain list and for each domain group commands, events, and entities
+      - use English language for output
+
