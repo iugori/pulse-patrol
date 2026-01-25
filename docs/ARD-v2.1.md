@@ -18,6 +18,13 @@
           * [Use Case 4 (Support Staff)](#use-case-4-support-staff)
           * [Use Case 5 (Administrator)](#use-case-5-administrator)
           * [Use Case 6 (Administrator)](#use-case-6-administrator)
+      * [Data Sources and Particularities](#data-sources-and-particularities)
+        * [Patient Identification & Demographic Data](#patient-identification--demographic-data)
+        * [Electronic Health Records (EHR) & Admission Forms](#electronic-health-records-ehr--admission-forms)
+        * [Medical Equipment Telemetry (Real-time Monitoring)](#medical-equipment-telemetry-real-time-monitoring)
+        * [Laboratory Information Systems (Test Results)](#laboratory-information-systems-test-results)
+        * [Transfer & Continuity of Care Records](#transfer--continuity-of-care-records)
+        * [Audit & Access Logs](#audit--access-logs)
     * [Out of Scope](#out-of-scope)
   * [2. Proposed Approach](#2-proposed-approach)
     * [Strategy and Architectural Goals](#strategy-and-architectural-goals)
@@ -118,9 +125,59 @@ so that **I can ensure continuity of care and proper handling of patient data**.
 
 [//]: # (S: </use-cases>)
 
+
+#### Data Sources and Particularities
+
+[//]: # (S: <data-sources>)
+
+The system manages a complex flow of Protected Health Information (PHI) and Personal Identifiable Information (PII)
+that requires a multi-layered approach to legal compliance and technical security.
+All data must be encrypted both at rest and in transit, with strict role-based access controls ensuring
+that Doctors and Support Staff only access records relevant to their specific hospital.
+Under GDPR and HIPAA frameworks, the system must maintain immutable audit logs for every data interaction
+to ensure accountability and patient privacy.
+Furthermore, to facilitate the seamless transfer of patients between healthcare companies,
+the system adheres to data portability standards, providing structured,
+machine-readable exports while maintaining the integrity of real-time equipment telemetry used for critical alerting.
+
+##### Patient Identification & Demographic Data
+
+- *Source:* Admission forms and initial registration via the Administrator or Patient (R1).
+- *Legal Owner:* The Patient (as the subject) and the Healthcare Provider (as the data controller).
+
+##### Electronic Health Records (EHR) & Admission Forms
+
+- *Source:* Manual entry by Administrators/Support Staff and historical records.
+- *Legal Owner:* Usually the Healthcare Provider (Hospital/Clinic) where the data was generated, though patients hold rights to access and portability.
+
+##### Medical Equipment Telemetry (Real-time Monitoring)
+
+- *Source:* Direct data streams from medical equipment (e.g., heart rate monitors, ventilators).
+- *Legal Owner:* The Healthcare Provider (as the entity conducting the investigation).
+
+##### Laboratory Information Systems (Test Results)
+
+- *Source:* External or internal diagnostic labs.
+- *Legal Owner:* The Lab or the Ordering Healthcare Provider.
+
+##### Transfer & Continuity of Care Records
+
+- *Source:* Administrative metadata generated during patient transfers between healthcare companies.
+- *Legal Owner:* Joint Ownership or delegated responsibility between the originating and receiving healthcare companies.
+
+##### Audit & Access Logs
+
+- *Source:* System-generated logs of Doctor, Admin, and Patient activity.
+- *Legal Owner:* The Healthcare Software Operator/Company.
+
+[//]: # (S: </data-sources>)
+
+
 ### Out of Scope
 
 [//]: # (<<What functional & non-functional requirements we won’t cover in this ARD.>>)
+
+[//]: # (S: <out-of-scope>)
 
 The following items are explicitly excluded from the current architectural design and implementation phase:
 
@@ -141,6 +198,9 @@ The following items are explicitly excluded from the current architectural desig
 
 - **Identity Provisioning**: The system will integrate with existing Identity Providers (IdP) but will not manage the
   primary creation or physical verification of government-issued identities for patients.
+
+[//]: # (S: </out-of-scope>)
+
 
 ## 2. Proposed Approach
 
