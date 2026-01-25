@@ -29,14 +29,21 @@
   * [2. Proposed Approach](#2-proposed-approach)
     * [Strategy and Architectural Goals](#strategy-and-architectural-goals)
     * [System Context (C4 Level 1)](#system-context-c4-level-1)
+    * [Specialized Microservices](#specialized-microservices)
+      * [Care & Clinical Record Service (CCRS)](#care--clinical-record-service-ccrs)
+      * [Vital Stream & Alerting Service (VSAS)](#vital-stream--alerting-service-vsas)
+      * [Compliance & Identity Service (CIS)](#compliance--identity-service-cis)
+      * [Integration & Interop Gateway (IIG)](#integration--interop-gateway-iig)
+    * [Data Flow Diagram](#data-flow-diagram)
   * [3. Individual Components Roles and Responsibilities](#3-individual-components-roles-and-responsibilities)
-    * [Use Case Realization](#use-case-realization)
-      * [Use Case 1 (Patient)](#use-case-1-patient-1)
-      * [Use Case 2 (Doctor)](#use-case-2-doctor-1)
-      * [Use Case 3 (Doctor)](#use-case-3-doctor-1)
-      * [Use Case 4 (Support Staff)](#use-case-4-support-staff-1)
-      * [Use Case 5 (Administrator)](#use-case-5-administrator-1)
-      * [Use Case 6 (Administrator)](#use-case-6-administrator-1)
+    * [Deployable Units (C4 Level 2)](#deployable-units-c4-level-2)
+      * [Use Case Realization](#use-case-realization)
+        * [Use Case 1 (Patient)](#use-case-1-patient-1)
+        * [Use Case 2 (Doctor)](#use-case-2-doctor-1)
+        * [Use Case 3 (Doctor)](#use-case-3-doctor-1)
+        * [Use Case 4 (Support Staff)](#use-case-4-support-staff-1)
+        * [Use Case 5 (Administrator)](#use-case-5-administrator-1)
+        * [Use Case 6 (Administrator)](#use-case-6-administrator-1)
   * [4. Deployment](#4-deployment)
   * [5. Dependencies](#5-dependencies)
   * [6. Data Flows/APIs](#6-data-flowsapis)
@@ -254,7 +261,7 @@ graph LR
         direction LR
     %% Actors
         subgraph ExternalUsers ["External Users"]
-            P(("«person»<br/>👥 Patient&nbsp;")):::depExt
+            P(("«person»<br/>👤 Patient&nbsp;")):::depExt
         end
 
         subgraph InternalUsers ["Internal Users"]
@@ -292,10 +299,130 @@ graph LR
     class ExternalInfrastructure groups
 ```
 
+### Specialized Microservices
+
+#### Care & Clinical Record Service (CCRS)
+
+Bounded Contexts: Care Coordination & Admissions, Clinical Records.
+
+Supported Functionalities:
+
+- Admission Lifecycle: Managing patient check-ins, registration, and demographic updates.
+- Health Record Management: CRUD operations for medical history, allergies, and diagnoses.
+- Lab Integration: Processing and storing test results from Laboratory Information Systems (LIS).
+- Transfer Orchestration: Packaging patient data into encrypted snapshots for inter-company portability.
+
+Events:
+
+| Name                 | Description                                                            |
+|----------------------|------------------------------------------------------------------------|
+| PatientAdmitted      | Triggered when a patient is officially checked into a facility.        |
+| MedicalRecordUpdated | Emitted when diagnoses, procedures, or allergies are modified.         |
+| TestResultPublished  | Produced when laboratory data is imported and ready for viewing.       |
+| TransferRequestSent  | Triggered when an Admin initiates a data export to a peer company.     |
+| TransferAcknowledged | Produced when a peer company confirms successful receipt of a patient. |
+| RecordAccessed       | A privacy event emitted whenever a clinical document is viewed.        |
+
+#### Vital Stream & Alerting Service (VSAS)
+
+Bounded Contexts: Vital Signs & Monitoring, Notification & Alerting.
+
+Supported Functionalities:
+
+- Telemetry Ingestion: High-throughput processing of real-time streams (Heart rate, SpO2, etc.).
+- Threshold Evaluation: Real-time analysis of incoming data against predefined "abnormal" triggers.
+- Alert Dispatch: Immediate routing of critical notifications to the Clinical Dashboard and mobile devices.
+- Short-term Buffer: Maintaining a high-resolution rolling window of physiological data for immediate review.
+
+Events:
+
+| Name                      | Description                                                                    |
+|---------------------------|--------------------------------------------------------------------------------|
+| TelemetryBatchIngested    | Produced when a window of sensor data (e.g., 5 seconds of SpO2) is stored.     |
+| AbnormalThresholdDetected | Emitted the moment the analysis engine identifies a value outside safe limits. |
+| AlertTriggered            | Produced when a notification is dispatched to doctors/support staff.           | 
+| AlertAcknowledged         | Triggered when a staff member responds to a notification via the dashboard.    |
+
+#### Compliance & Identity Service (CIS)
+
+Bounded Contexts: Security & Audit (Generic).
+
+Supported Functionalities:
+
+- Immutable Auditing: Recording every data access and modification event in a tamper-proof log.
+- RBAC & Permissions: Managing "who sees what" based on hospital affiliation and staff role.
+- Consent Management: Tracking patient permissions for data sharing and transfers.
+- Identity Federation: Bridging with external IdPs for secure staff and patient login.
+
+Events:
+
+| Name                   | Description                                                                          |
+|------------------------|--------------------------------------------------------------------------------------|
+| UserAuthenticated      | Emitted when a Patient, Doctor, or Admin successfully logs in.                       |
+| AccessDenied           | Produced when an unauthorized attempt to view PHI/PII occurs.                        |
+| ConsentGranted/Revoked | Triggered when a patient updates their data-sharing preferences.                     |
+| AuditLogSealed         | A technical event emitted when a batch of logs is hashed/finalized for immutability. |
+
+#### Integration & Interop Gateway (IIG)
+
+Bounded Contexts: Infrastructure (Cross-cutting).
+
+Supported Functionalities:
+
+- Protocol Translation: Converting legacy messages into internal system events.
+- Medical Equipment Adapter: Normalizing various proprietary IoT data formats into a unified stream.
+- Peer-to-Peer Handshake: Managing the technical secure tunnel for patient transfers to external healthcare companies.
+
+Events:
+
+| Name                      | Description                                                                            |
+|---------------------------|----------------------------------------------------------------------------------------|
+| ExternalMessageReceived   | Emitted when a message arrives from a legacy system.                                   |
+| EquipmentStreamNormalised | Produced when proprietary IoT data is converted into the standard Pulse Patrol format. |
+| TransferRequestReceived   | Triggered when an external peer company attempts to move a patient into the system.    |
+
+### Data Flow Diagram
+
+```mermaid
+graph LR
+    subgraph Legend [Legend]
+        direction LR
+        dependency>"Requester"]
+        boundary(Sytem<br/>Boundary)
+        controller((Controller))
+        persistence[(Persistence)]
+        queue[[Queue]]
+        dependency ~~~ boundary ~~~ controller ~~~ persistence ~~~ queue
+    end
+
+    subgraph DataFlow["Data Flow Diagram with Async Event"]
+        direction LR
+    %% Node Definitions
+        P>"«person»<br/>👤 Patient"]
+        WP("Web<br/>Portal")
+        PMS(("Patient<br/>Management<br/>Services"))
+        DS[("Data<br/>Storage")]
+        Queue[["Audit"]]
+    %% Synchronous Flow
+        P -- 1 . Requests<br/>info --> WP
+        WP -- 2 . Forwards --> PMS
+        PMS -- 3 . Queries --> DS
+        DS -- 4 . Returns --> PMS
+        PMS -.->|5 . Emit ^RecordAccessed^ event| Queue
+        PMS -- 6 . Sends --> WP
+        WP -- 7 . Displays --> P
+
+    end
+
+    class CIS async
+```
+
 ## 3. Individual Components Roles and Responsibilities
 
 [//]: # (<<For each component describe its role and responsibility.
 Add container/component and other UML diagrams if needed &#40;sequence&#41;>>)
+
+### Deployable Units (C4 Level 2)
 
 The system will be decomposed into the following functional units:
 
@@ -328,7 +455,7 @@ graph TB
     Diagram ~~~ Legend
     subgraph Diagram ["Container Diagram"]
         direction TB
-        Patient(("«person»<br/>👥 Patient&nbsp;")):::depExt
+        Patient(("«person»<br/>👤 Patient&nbsp;")):::depExt
         Admin(("«person»<br/>👤 Admin&nbsp;")):::depInt
         Doctor(("«person»<br/>👤 Doctor&nbsp;")):::depInt
         Support(("«person»<br/>👤 Support&nbsp;<br/>Staff")):::depInt
@@ -371,9 +498,9 @@ graph TB
 
 ```
 
-### Use Case Realization
+#### Use Case Realization
 
-#### Use Case 1 (Patient)
+##### Use Case 1 (Patient)
 
 As a **Patient**,
 I want **to access my medical records, test results, and admission forms through a web application**,
@@ -394,7 +521,7 @@ sequenceDiagram
 
 ```
 
-#### Use Case 2 (Doctor)
+##### Use Case 2 (Doctor)
 
 As a **Doctor**,
 I want **to access the data of my patients admitted to the hospital**,
@@ -421,7 +548,7 @@ sequenceDiagram
     CD -->> D: Display Integrated Patient View
 ```
 
-#### Use Case 3 (Doctor)
+##### Use Case 3 (Doctor)
 
 As a **Doctor**,
 I want **to receive alerts for abnormal values detected by monitoring systems**,
@@ -456,7 +583,7 @@ sequenceDiagram
     CD -->> SS: Display comprehensive patient status
 ```
 
-#### Use Case 4 (Support Staff)
+##### Use Case 4 (Support Staff)
 
 As a **Support Staff Member**,
 I want **to receive alerts for abnormal values in patient monitoring**,
@@ -488,7 +615,7 @@ sequenceDiagram
     Note right of D: Doctor intervenes based on alert
 ```
 
-#### Use Case 5 (Administrator)
+##### Use Case 5 (Administrator)
 
 As an **Administrator**,
 I want **to manage patient records effectively**,
@@ -524,7 +651,7 @@ sequenceDiagram
     Portal -->> Admin: Display Success Message
 ```
 
-#### Use Case 6 (Administrator)
+##### Use Case 6 (Administrator)
 
 As an **Administrator**,
 I want **to facilitate the transfer of patients between healthcare companies**,
@@ -631,7 +758,7 @@ graph TD
     classDef entityValue fill: LightGreen, stroke: #333, stroke-width: 1.5px;
     subgraph Legend [Legend]
         direction TB
-        L1["Bounded Context"]:::boundedContext
+        L1["Domain"]:::boundedContext
         L2["Aggregate"]:::aggregate
         L3["Entity / Value Object"]:::entityValue
     end
@@ -704,7 +831,7 @@ graph TD
     classDef entityValue fill: LightGreen, stroke: #333, stroke-width: 1.5px;
     subgraph Legend [Legend]
         direction TB
-        L1["Bounded Context"]:::boundedContext
+        L1["Domain"]:::boundedContext
         L2["Aggregate"]:::aggregate
         L3["Entity / Value Object"]:::entityValue
     end
@@ -776,7 +903,7 @@ graph TD
     classDef entityValue fill: LightGreen, stroke: #333, stroke-width: 1.5px;
     subgraph Legend [Legend]
         direction TB
-        L1["Bounded Context"]:::boundedContext
+        L1["Domain"]:::boundedContext
         L2["Aggregate"]:::aggregate
         L3["Entity / Value Object"]:::entityValue
     end
@@ -839,7 +966,7 @@ graph TD
     classDef entityValue fill: LightGreen, stroke: #333, stroke-width: 1.5px;
     subgraph Legend [Legend]
         direction TB
-        L1["Bounded Context"]:::boundedContext
+        L1["Domain"]:::boundedContext
         L2["Aggregate"]:::aggregate
         L3["Entity / Value Object"]:::entityValue
     end

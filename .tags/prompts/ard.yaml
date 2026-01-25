@@ -8,14 +8,14 @@ parameters:
   stopSequences: null
 
 defaults:
-  business-requirements: "file://docs/ARD-v2.1.md#business-requirements"
-  data-sources: "file://docs/ARD-v2.1.md#data-sources"
-  deployable-units: "file://docs/ARD-v2.1.md#functional-units"
-  external-entities: "file://docs/ARD-v2.1.md#external-entities"
+  business-requirements: "file://docs/ARD-v2.1-RFC.md#business-requirements"
+  data-sources: "file://docs/ARD-v2.1-RFC.md#data-sources"
+  deployable-units: "file://docs/ARD-v2.1-RFC.md#functional-units"
+  external-entities: "file://docs/ARD-v2.1-RFC.md#external-entities"
   max-short-problem-description-words: 50
-  out-of-scope: "file://docs/ARD-v2.1.md#out-of-scope"
-  personas: "file://docs/ARD-v2.1.md#personas"
-  use-cases: "file://docs/ARD-v2.1.md#use-cases"
+  out-of-scope: "file://docs/ARD-v2.1-RFC.md#out-of-scope"
+  personas: "file://docs/ARD-v2.1-RFC.md#personas"
+  use-cases: "file://docs/ARD-v2.1-RFC.md#use-cases"
 
 system: |
   You are a helpful and precise AI assistant.
