@@ -29,7 +29,7 @@
       * [sGW → sPM / sTA (Data Normalization)](#sgw--spm--sta-data-normalization)
       * [sTA → iDOC / iSSM (Critical Alerting)](#sta--idoc--issm-critical-alerting)
       * [sPM / sTA / sAAA → pDS (Persistence Layer)](#spm--sta--saaa--pds-persistence-layer)
-      * [sPM / sTA / sGW → sCI (Audit Logging)](#spm--sta--sgw--sci-audit-logging)
+      * [sPM / sTA / sGW → sAAA (Audit Logging)](#spm--sta--sgw--saaa-audit-logging)
   * [4. Consequences](#4-consequences)
 <!-- TOC -->
 
@@ -182,74 +182,74 @@ high-throughput, non-blocking requirements of medical telemetry and audit loggin
 
 #### ePP / iADM → uiWP (User Portal Access)
 
-_Type_: Synchronous (HTTPS/TLS)
+_Type_: Synchronous, Request/Response, (HTTPS/TLS (REST))
 
 _Detail_: Patients and Admins initiate sessions via browser. High-security measures (MFA) are enforced.
 
 #### iDOC / iSSM → uiCD (Clinical Monitoring)
 
-_Type_: Synchronous & Reactive (HTTPS + WebSockets)
+_Type_: Sync & Reactive, Bidirectional, (HTTPS + WebSockets (WSS))
 
 _Detail_: Clinical staff initiate the connection; uiCD maintains a persistent socket to receive live telemetry updates
 pushed from the backend.
 
 #### uiWP / uiCD → sAAA (Identity & Auth)
 
-_Type_: Synchronous (OIDC/OAuth2)
+_Type_: Synchronous, Request/Response, (OIDC / OAuth2 (over HTTPS))
 
 _Detail_: UI components initiate authentication and authorization requests to verify user permissions.
 
 #### uiWP → sPM (Record Management)
 
-_Type_: Synchronous (REST)
+_Type_: Synchronous, Request/Response, (REST (JSON))
 
 _Detail_: Web Portal initiates requests for medical record views, admission form submissions, and transfer triggers.
 
 #### uiCD → sTA / sPM (Clinical Data Fetch)
 
-_Type_: Synchronous (REST)
+_Type_: Synchronous	, Request/Response, (REST or gRPC)
 
 _Detail_: Dashboard initiates data fetches for patient history (sPM) and real-time monitoring configurations (sTA).
 
 #### iEQP → sGW (Telemetry Ingestion)
 
-_Type_: Streaming (MQTT)
+_Type_: Asynchronous, Stream, (MQTT (QoS 0/2))
 
 _Detail_: Medical equipment initiates the data flow, streaming raw telemetry packets to the gateway.
 
 #### iLEG ↔ sGW (Legacy Integration)
 
-_Type_: Bidirectional (HL7 FHIR / SFTP)
+_Type_: Asynchronous, File/Batch/Stream, (HL7 FHIR / MLLP)
 
 _Detail_: sGW initiates pulls for historical data, while iLEG may push updates regarding new admissions.
 
 #### sGW ↔ ePEER (Inter-Provider Transfer)
 
-_Type_: Synchronous (mTLS REST API)
+_Type_: Synchronous, Request/Response, (mTLS REST API)
 
 _Detail_: Handshake-based transfer where either peer can initiate a record transfer request.
 
 #### sGW → sPM / sTA (Data Normalization)
 
-_Type_: Asynchronous (Message Bus)
+_Type_: Asynchronous, Queue, (Message Broker specific)
 
 _Detail_: The gateway pushes normalized data to the relevant service for processing or storage.
 
 #### sTA → iDOC / iSSM (Critical Alerting)
 
-_Type_: Push Notification (WebSockets / Mobile Push Service)
+_Type_:  Asynchronous, Push Notification, (WebSockets / Mobile Push Service)
 
 _Detail_: sTA initiates the flow upon detecting abnormal vitals, alerting staff immediately.
 
 #### sPM / sTA / sAAA → pDS (Persistence Layer)
 
-_Type_: Synchronous (SQL / Time-Series Driver)
+_Type_: Synchronous, Direct Connection, (DB Driver / gRPC)
 
 _Detail_: Services initiate read/write operations to their respective database schemas.
 
-#### sPM / sTA / sGW → sCI (Audit Logging)
+#### sPM / sTA / sGW → sAAA (Audit Logging)
 
-_Type_: Asynchronous (Message Queue)
+_Type_: Asynchronous, Queue, (Message Broker specific)
 
 _Detail_: Every time a patient data access occurs (e.g., a Doctor viewing a record, a new lab report coming in), the
 handling service emits an event containing the Actor ID, Patient ID, Timestamp, and Resource Accessed.

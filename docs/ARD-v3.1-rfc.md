@@ -37,6 +37,8 @@
     * [Data Flow Diagram](#data-flow-diagram)
   * [3. Individual Components Roles and Responsibilities](#3-individual-components-roles-and-responsibilities)
     * [Deployable Units (C4 Level 2)](#deployable-units-c4-level-2)
+        * [Container relationships diagram](#container-relationships-diagram)
+        * [Container communication diagram](#container-communication-diagram)
       * [Use Case Realization](#use-case-realization)
         * [Use Case 1 (Patient)](#use-case-1-patient-1)
         * [Use Case 2 (Doctor)](#use-case-2-doctor-1)
@@ -436,8 +438,11 @@ The system will be decomposed into the following functional units:
   abnormal values.
 - **Data Storage**: Centralized repository for structured medical records and time-series telemetry data.
 - **Integration Gateway**: Handles communication with Legacy Systems, Medical Equipment, and Peer Healthcare Companies.
+- **Compliance & Identity Services**: Compliance & Identity Services: Handles authentication, authorization, audit...
 
 [//]: # (S: </functional-units>)
+
+##### Container relationships diagram
 
 ```mermaid
 graph TB
@@ -445,6 +450,7 @@ graph TB
     classDef depInt fill: #a8e6a1, stroke: #333, stroke-width: 1.5px;
     classDef theSys fill: white, stroke: #333, stroke-width: 1.5px;
     classDef container fill: #92c6ff, stroke: #333, stroke-width: 1.5px;
+%%-
     subgraph Legend [Legend]
         direction TB
         L1["External Dependency"]:::depExt
@@ -453,6 +459,7 @@ graph TB
         L4["Container"]:::container
     end
     Diagram ~~~ Legend
+%%-
     subgraph Diagram ["Container Diagram"]
         direction TB
         Patient(("«person»<br/>👤 Patient&nbsp;")):::depExt
@@ -467,6 +474,7 @@ graph TB
             TAS["«container»<br/>Telemetry & Alerting&nbsp;<br/>Services"]:::container
             Storage[("«container»<br/>Data Storage&nbsp;")]:::container
             Gateway["«container»<br/>Integration Gateway&nbsp;"]:::container
+            CIS["«container»<br/>Compliance & Identity&nbsp;<br/>Services"]:::container
         end
 
         Peer["«software system»<br/>🌐 Peer Healthcare Companies&nbsp;"]:::depExt
@@ -495,8 +503,101 @@ graph TB
 %% Grouping Styling
     class Pulse_Patrol_System theSys
     style Pulse_Patrol_System fill: #33aaff, color: #fff, stroke: #333, stroke-width: 2px
-
 ```
+
+##### Container communication diagram
+
+```mermaid
+graph TB
+    classDef depExt fill: #f8a3a3, stroke: #333, stroke-width: 1.5px;
+    classDef depInt fill: #a8e6a1, stroke: #333, stroke-width: 1.5px;
+    classDef theSys fill: white, stroke: #333, stroke-width: 1.5px;
+    classDef container fill: #92c6ff, stroke: #333, stroke-width: 1.5px;
+%%-
+    subgraph Legend [Legend]
+        direction TB
+        L1["External Dependency"]:::depExt
+        L2["Internal Dependency"]:::depInt
+        L3["Core System"]:::theSys
+        L4["Container"]:::container
+        Source[Source &lpar;initiates communication&rpar;] -->|Sync| Target
+        Source[Source &lpar;initiates communication&rpar;] -.->|Async| Target
+    end
+    Diagram ~~~ Legend
+%%-
+    subgraph Diagram ["Container Diagram (Inter-Service Communication)"]
+        direction LR
+        Patient(("<br/><br/><span style='font-size:50px'>👤</span><br/><br/>&nbsp;&nbsp;Patient&nbsp;&nbsp;")):::depExt
+        Admin(("<br/><br/><span style='font-size:50px'>👤</span><br/><br/>&nbsp;&nbsp;&nbsp;Admin&nbsp;&nbsp;&nbsp;")):::depInt
+        Doctor(("<br/><br/><span style='font-size:50px'>👤</span><br/><br/>&nbsp;&nbsp;&nbsp;Doctor&nbsp;&nbsp;&nbsp;")):::depInt
+        Support(("<br/><br/><span style='font-size:56px'>👤</span><br/><br/>Support Staff")):::depInt
+
+        subgraph Pulse_Patrol_System ["«software system» 🫀 Pulse Patrol System Boundary"]
+            direction TB
+            Portal["«container»<br/>Web Portal (uiWP)"]:::container
+            Dashboard["«container»<br/>Clinical Dashboard (uiCD)"]:::container
+            Gateway["«container»<br/>Integration Gateway (sGW)"]:::container
+
+            subgraph ssPMS["&nbsp;"]
+                PMSq[["«queue»<br/>PM"]]:::container
+                PMS["«container»<br/>Patient Management (sPM)"]:::container
+                Spms[("«container»<br/>Data Storage (pPM)")]:::container
+            end
+
+            subgraph ssTAS["&nbsp;"]
+                TASq[["«queue»<br/>TA"]]:::container
+                TAS["«container»<br/>Telemetry & Alerting (sTA)"]:::container
+                Stas[("«container»<br/>Data Storage (pTA)")]:::container
+            end
+
+            subgraph ssAAA["&nbsp;"]
+                direction LR
+                AAAq[["«queue»<br/>Audit"]]:::container
+                AAA["«container»<br/>Compliance & Identity (sAAA)"]:::container
+                Saaa[("«container»<br/>Data Storage (pAAA)")]:::container
+            end
+        end
+
+        Peer["«software system»<br/>🌐 Peer Healthcare (ePEER)"]:::depExt
+        Equipment["«software system»<br/>📠 Medical Equipment (iEQP)"]:::depInt
+        Legacy["«software system»<br/>💾 Legacy Systems (iLEG)"]:::depInt
+    end
+
+%% User to UI
+    Patient -->|HTTPS| Portal
+    Admin -->|HTTPS| Portal
+    Doctor <-->|HTTPS + WSS| Dashboard
+    Support <-->|HTTPS + WSS| Dashboard
+%% UI to Services
+    Portal -->|OIDC/OAuth2| AAA
+    Dashboard -->|OIDC/OAuth2| AAA
+    Portal -->|REST| PMS
+    Dashboard <-->|REST| TAS
+    Dashboard -->|REST| PMS
+    PMS -->|&lpar;Read&rpar;| PMSq
+    TAS -->|&lpar;Read&rpar;| TASq
+%% Integration & Telemetry
+    Equipment -->|MQTT QoS 0/2| Gateway
+    Gateway <-->|HL7 FHIR / MLLP| Legacy
+    Gateway <-->|mTLS REST| Peer
+    Gateway -..->|Async Message| PMSq
+    Gateway -.->|Async Message| TASq
+%% Backend to Persistence & Audit
+    PMS -->|DB Driver| Spms
+    TAS -->|DB Driver| Stas
+    AAA -->|DB Driver| Saaa
+    PMS -.->|Async Audit Queue| AAAq
+    TAS -.->|Async Audit Queue| AAAq
+    Gateway -.->|Async Audit Queue| AAAq
+    AAA -->|&lpar;Read&rpar;| AAAq
+%% Reactive Alerts
+    TAS -->|Mobile Push| Doctor
+    TAS -->|Mobile Push| Support
+%% Styling
+    class Pulse_Patrol_System theSys
+    style Pulse_Patrol_System fill: #f5f5f5, stroke: #333, stroke-width: 2px
+```
+
 
 #### Use Case Realization
 
