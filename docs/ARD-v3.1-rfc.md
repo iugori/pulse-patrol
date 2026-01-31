@@ -527,10 +527,10 @@ graph TB
 %%-
     subgraph Diagram ["Container Diagram (Inter-Service Communication)"]
         direction LR
-        Patient(("<br/><br/><span style='font-size:50px'>👤</span><br/><br/>&nbsp;&nbsp;Patient&nbsp;&nbsp;")):::depExt
-        Admin(("<br/><br/><span style='font-size:50px'>👤</span><br/><br/>&nbsp;&nbsp;&nbsp;Admin&nbsp;&nbsp;&nbsp;")):::depInt
-        Doctor(("<br/><br/><span style='font-size:50px'>👤</span><br/><br/>&nbsp;&nbsp;&nbsp;Doctor&nbsp;&nbsp;&nbsp;")):::depInt
-        Support(("<br/><br/><span style='font-size:56px'>👤</span><br/><br/>Support Staff")):::depInt
+        Patient(("<br/>«person»<br/><span style='font-size:50px'>👤</span><br/><br/>&nbsp;&nbsp;Patient&nbsp;&nbsp;")):::depExt
+        Admin(("<br/>«person»<br/><span style='font-size:50px'>👤</span><br/><br/>&nbsp;&nbsp;&nbsp;Admin&nbsp;&nbsp;&nbsp;")):::depInt
+        Doctor(("<br/>«person»<br/><span style='font-size:50px'>👤</span><br/><br/>&nbsp;&nbsp;&nbsp;Doctor&nbsp;&nbsp;&nbsp;")):::depInt
+        Support(("«person»<br/><br/><span style='font-size:56px'>👤</span><br/><br/>Support Staff")):::depInt
 
         subgraph Pulse_Patrol_System ["«software system» 🫀 Pulse Patrol System Boundary"]
             direction TB
