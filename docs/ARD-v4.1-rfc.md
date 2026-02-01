@@ -47,6 +47,14 @@
         * [Use Case 5 (Administrator)](#use-case-5-administrator-1)
         * [Use Case 6 (Administrator)](#use-case-6-administrator-1)
   * [4. Deployment](#4-deployment)
+    * [Runtime Technologies](#runtime-technologies)
+      * [Compute & Frontend (Nodes)](#compute--frontend-nodes)
+      * [Data Storage & Caching](#data-storage--caching)
+      * [Communication (Edges)](#communication-edges)
+    * [Development & Maintenance Technologies](#development--maintenance-technologies)
+    * [AWS Overview](#aws-overview)
+      * [Consolidated Technology Summary](#consolidated-technology-summary)
+      * [SWOT Analysis: AWS AI Technologies](#swot-analysis-aws-ai-technologies)
   * [5. Dependencies](#5-dependencies)
   * [6. Data Flows/APIs](#6-data-flowsapis)
     * [Bounded Contexts](#bounded-contexts)
@@ -925,6 +933,95 @@ sequenceDiagram
 ## 4. Deployment
 
 [//]: # (<<Include a deployment diagram and documentation about it - regions, communication, networking, etc.>>)
+
+### Runtime Technologies
+
+This section maps the architectural nodes and edges to live AWS infrastructure.
+
+#### Compute & Frontend (Nodes)
+
+* **uiWP & uiCD (Web/Clinical Dashboards):** Hosted on **Amazon S3** (Static Website) and distributed via **Amazon
+  CloudFront**.
+* **sPM, sTA, sAAA (Microservices):**
+    * *Primary:* **AWS Fargate (on Amazon ECS)**. Serverless container orchestration
+      provides scaling without managing VMs.
+    * *Alternative:* **AWS Lambda**. Lower cost for low-traffic services, but potential "cold starts" are risky for
+      sTA (
+      Telemetry).
+    * **Trade-off:** Fargate is better for the 24/7 uptime required by hospitals.
+
+
+* **sGW (Integration Gateway):** **AWS IoT Core** for MQTT (iEQP) and **Amazon API Gateway** for REST.
+
+#### Data Storage & Caching
+
+* **Structured Records (sPM):** **Amazon Aurora (PostgreSQL)**. HIPAA-compliant and supports relational integrity.
+* **High-Frequency Telemetry (sTA):** **Amazon Timestream**. Optimized for time-series data from equipment.
+* **Clinical Reports/Images (S3):** **Amazon S3** with **S3 Object Lock** (for e-documents/signatures).
+    * *Optimization:* **S3 Intelligent-Tiering** to move old scans to cheaper storage automatically.
+
+* **Caching:** **Amazon ElastiCache (Redis)** for session data and hot patient records to reduce DB load.
+
+#### Communication (Edges)
+
+* **Async Messaging (sGW → sPM/sTA):** **Amazon SNS/SQS** for internal decoupling.
+* **Real-time Alerts (sTA → iDOC):** **AWS AppSync** (GraphQL subscriptions/WebSockets) or **AWS End User Messaging** (
+  replacing Mobile
+  Push).
+* **Audit Logging (sPM → sAAA):** **Amazon Kinesis Data Streams** for high-volume, "fire-and-forget" audit ingest.
+
+### Development & Maintenance Technologies
+
+AWS tools to support the Software Development Life Cycle (SDLC).
+
+| Phase              | AWS Technology               | Purpose                                                                          |
+|--------------------|------------------------------|----------------------------------------------------------------------------------|
+| **Source Control** | **AWS CodeCommit**           | Secure, private Git repositories.                                                |
+| **CI/CD**          | **AWS CodePipeline**         | Automated testing and deployment to Fargate.                                     |
+| **IAC**            | **AWS CDK / CloudFormation** | Infrastructure as Code for environment replication (Selling to other companies). |
+| **Monitoring**     | **Amazon CloudWatch**        | Metrics, logs, and alarms for system health.                                     |
+| **Observability**  | **AWS X-Ray**                | Distributed tracing to track a request across microservices.                     |
+| **Security**       | **AWS Secrets Manager**      | Securely manage DB credentials and API keys.                                     |
+
+### AWS Overview
+
+#### Consolidated Technology Summary
+
+| Official Name                 | Description                                                                               | Documentation Link                                                                                  |
+|-------------------------------|-------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------|
+| **AWS AppSync**               | GraphQL/WebSocket service for real-time dashboard updates and alerts.                     | [AppSync Docs](https://docs.aws.amazon.com/appsync/)                                                |
+| **AWS CDK**                   | Infrastructure-as-Code framework to define resources using programming languages.         | [CDK Docs](https://docs.aws.amazon.com/cdk/)                                                        |
+| **AWS CodeCommit**            | A managed source control service that hosts secure Git-based repositories.                | [CodeCommit Docs](https://docs.aws.amazon.com/codecommit/)                                          |
+| **AWS CodePipeline**          | CI/CD service for automating software release workflows.                                  | [CodePipeline Docs](https://docs.aws.amazon.com/codepipeline/)                                      |
+| **AWS End User Messaging**    | It provides a unified API for scalable, secure user engagement and transactional alerts.  | [EUM Documentation](https://docs.aws.amazon.com/end-user-messaging/)                                |
+| **AWS IoT Core**              | Managed broker for MQTT telemetry ingestion from medical equipment.                       | [IoT Core Docs](https://docs.aws.amazon.com/iot/)                                                   |
+| **AWS Lambda**                | Serverless compute for event-driven tasks and light-weight data processing.               | [Lambda Docs](https://docs.aws.amazon.com/lambda/)                                                  |
+| **AWS Secrets Manager**       | Securely encrypts, stores, and rotates database credentials, API keys, and other secrets. | [Secrets Manager Docs](https://docs.aws.amazon.com/secretsmanager/)                                 |
+| **AWS X-Ray**                 | Distributed tracing to analyze and debug microservice performance.                        | [X-Ray Docs](https://docs.aws.amazon.com/xray/)                                                     |
+| **Amazon API Gateway**        | Managed service for creating, publishing, and securing REST APIs.                         | [API Gateway Docs](https://docs.aws.amazon.com/apigateway/)                                         |
+| **Amazon Aurora**             | High-performance relational DB for patient records and admin data.                        | [Aurora Docs](https://docs.aws.amazon.com/rds/)                  |
+| **Amazon CloudFront**         | Content Delivery Network (CDN) to serve the Web Portal with low latency.                  | [CloudFront Docs](https://docs.aws.amazon.com/cloudfront/)                                          |
+| **Amazon CloudWatch**         | Monitoring and observability service for logs, metrics, and alarms.                       | [CloudWatch Docs](https://docs.aws.amazon.com/cloudwatch/)                                          |
+| **Amazon Comprehend Medical** | NLP service to extract medical information from unstructured clinical text.               | [Comprehend Medical Docs](https://docs.aws.amazon.com/comprehend-medical/)                          |
+| **Amazon ECS (Fargate)**      | Serverless container orchestration for core microservices (sPM, sTA, sAAA).               | [ECS Docs](https://docs.aws.amazon.com/ecs/)                                                        |
+| **Amazon ElastiCache**        | In-memory caching (Redis) for session management and hot-data access.                     | [ElastiCache Docs](https://docs.aws.amazon.com/elasticache/)                                        |
+| **Amazon HealthLake**         | Purpose-built service to store, transform, and analyze healthcare data (FHIR).            | [HealthLake Docs](https://docs.aws.amazon.com/healthlake/)                                          |
+| **Amazon Kinesis**            | Real-time data streaming for high-volume audit logs and telemetry.                        | [Kinesis Docs](https://docs.aws.amazon.com/kinesis/)                                                |
+| **Amazon Rekognition**        | Deep learning-based computer vision.                                                      | [Rekognition Docs](https://docs.aws.amazon.com/rekognition/)                                        |
+| **Amazon S3**                 | Durable object storage for clinical images (DICOM), PDFs, and web hosting.                | [S3 Docs](https://docs.aws.amazon.com/s3/)                                                          |
+| **Amazon SNS & SQS**          | Pub/Sub and queuing services for decoupled, asynchronous communication.                   | [SQS Docs](https://docs.aws.amazon.com/sqs/)                                                        |
+| **Amazon Timestream**         | Specialized time-series database for high-velocity vitals monitoring.                     | [Timestream Docs](https://docs.aws.amazon.com/timestream/)                                          |
+| **Amazon Transcribe Medical** | A HIPAA-eligible speech-to-text service specifically trained on medical vocabulary.       | [Transcribe Medical Docs](https://docs.aws.amazon.com/transcribe/latest/dg/transcribe-medical.html) |
+
+#### SWOT Analysis: AWS AI Technologies
+
+Focusing on clinical value-add and automation.
+
+|            | **Strengths**                                                                                                                        | **Weaknesses**                                                                                             |
+|------------|--------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------|
+| *Internal* | **Amazon HealthLake:** Seamlessly indexes FHIR data.<br><br>**Amazon Comprehend Medical:** Extracts entities from text reports.      | High specialized knowledge required to configure.<br><br>Pricing can scale quickly with high data volumes. |
+|            | <center>**Opportunities**</center>                                                                                                   | <center>**Threats**</center>                                                                               |
+| *External* | **Amazon Rekognition:** Analyze medical imagery for anomalies.<br><br>**Amazon Transcribe Medical:** Voice-to-text for doctor notes. | Regulatory scrutiny over AI-based diagnosis.<br><br>Potential "Black Box" bias in machine learning models. |
 
 ## 5. Dependencies
 

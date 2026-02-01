@@ -326,3 +326,31 @@ prompts:
       - use autonumber to clearly express the order of the actions
       - where applicable indicate the lifespan of the objects (activate/deactivate)
 
+  - id: "_13_CloudMapping"
+    template: |
+      You will be given a context describing the Pulse-Patrol software system.
+
+      After understanding its functional and non-functional requirements your tas will be to explain how such a system
+      can be deployed / supported by using AWS technologies.
+      Take into consideration the various kinds of data formats that are required for a hospital to run 
+      (patient records, clinical investigation reports (text, images, audio, video), e-documents that require signature, audit trails...).
+      Also take into consideration caching and other type of optimization.
+      
+      Hints:
+      - group technologies in 2 groups:
+        1. runtime technologies where you will describe how each node and each edge can be backed by AWS technologies
+        2. development / maintenance technologies (assuming that each phase of software development cycle benefits from AWS building blocks)
+      - where it makes sense provide alternatives (within the latest AWS offer) highlighting the tradeoffs (do not forget about pricing arguments)
+      - add a separate section where you will make a SWOT analysis for using AWS AI technologies (make sure you mention the name of each technology you include in the analysis)
+      - in the end make a summary of all the technologies that you identified as potentially adding value to the system and make a 
+        consolidated list with the official name of the technology, a brief description, and a link to the main page of the official documentation
+      
+      Now here is the system description:
+      
+      {{business-requirements}}
+      
+      {{use-cases}}
+      
+      {{container-diagram-relationships}}
+
+      {{adr-communication}}
