@@ -33,6 +33,8 @@
   * [4. Consequences](#4-consequences)
 <!-- TOC -->
 
+[//]: # (S: <adr>)
+
 ## 1. Context
 
 ### Scope
@@ -207,7 +209,7 @@ _Detail_: Web Portal initiates requests for medical record views, admission form
 
 #### uiCD → sTA / sPM (Clinical Data Fetch)
 
-_Type_: Synchronous	, Request/Response, (REST or gRPC)
+_Type_: Synchronous , Request/Response, (REST or gRPC)
 
 _Detail_: Dashboard initiates data fetches for patient history (sPM) and real-time monitoring configurations (sTA).
 
@@ -297,3 +299,5 @@ profile, reliability, and development lifecycle.
 
 - Strict Identity Management: Since the system is highly distributed, sAAA becomes a single point of failure (SPOF) for
   security. High availability (HA) for the identity service is mandatory.
+
+[//]: # (S: </adr>)

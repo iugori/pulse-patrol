@@ -1,0 +1,11 @@
+// ---------- ---------- ---------- ---------- ----------
+You will be given an ADR containing the communication between various parts of a software system.
+
+Your task is to go through each subsection of "Architectural (Communication) Edges" and for each "edge"
+fill the type with:
+
+- synchronous / asynchronous
+- stream / queue or whatever appropriate in this category
+- suggest a communication protocol - one of but not restricted to: REST, MQTT, gRPC, ...
+
+

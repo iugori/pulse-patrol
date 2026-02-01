@@ -8,14 +8,18 @@ parameters:
   stopSequences: null
 
 defaults:
-  business-requirements: "file://docs/ARD-v2.1-rfc.md#business-requirements"
-  data-sources: "file://docs/ARD-v2.1-rfc.md#data-sources"
-  deployable-units: "file://docs/ARD-v2.1-rfc.md#functional-units"
-  external-entities: "file://docs/ARD-v2.1-rfc.md#external-entities"
+  adr-communication: "file://docs/adr-v3.1-rfc.md#adr"
+  business-requirements: "file://docs/ARD-v3.1-rfc.md#business-requirements"
+  container-diagram-communication: "file://docs/ARD-v3.1-rfc.md#container-diagram-communication"
+  container-diagram-relationships: "file://docs/ARD-v3.1-rfc.md#container-diagram-relationships"
+  data-sources: "file://docs/ARD-v3.1-rfc.md#data-sources"
+  deployable-units: "file://docs/ARD-v3.1-rfc.md#functional-units"
+  external-entities: "file://docs/ARD-v3.1-rfc.md#external-entities"
   max-short-problem-description-words: 50
-  out-of-scope: "file://docs/ARD-v2.1-rfc.md#out-of-scope"
-  personas: "file://docs/ARD-v2.1-rfc.md#personas"
-  use-cases: "file://docs/ARD-v2.1-rfc.md#use-cases"
+  out-of-scope: "file://docs/ARD-v3.1-rfc.md#out-of-scope"
+  personas: "file://docs/ARD-v3.1-rfc.md#personas"
+  use-case: "file://docs/ARD-v3.1-rfc.md#use-case-???"
+  use-cases: "file://docs/ARD-v3.1-rfc.md#use-cases"
 
 system: |
   You are a helpful and precise AI assistant.
@@ -282,4 +286,43 @@ prompts:
       - do differentiate between each type of command / event / entity
       - format them as a domain list and for each domain group commands, events, and entities
       - use English language for output
+
+  - id: "_11_UpdateContainerDiagram"
+    template: |
+      You will be given an ADR describing the communication between the containers of a system and a container diagram (C4 model)
+
+      Your task will be to generate a new Mermaid diagram that renders the communication between services in a complete but very clear way.
+      Please retain the diagram style, layout, positioning.
+      Adjust the arrows according to the uni/bi directionality.
+
+      So here is the ADR
+
+      ```ADR
+      {{adr-communication}}
+      ```
+
+      and here is the diagram to be updated
+
+      {{container-diagram-relationships}}
+
+  - id: "_12_UpdateSequenceDiagram"
+    template: |
+      You will be given a context describing the communication between the containers of a system and your task will be to upgrade a Mermaid sequence diagram.
+
+      First you are required to understand the purpose of the system, the nodes (containers) of the diagram, and the edged (communication particularities):
+      
+      {{business-requirements}}
+
+      {{adr-communication}}
+      
+      {{container-diagram-relationships}}
+
+      **Given the understanding that you accumulated your task is now to update the sequence diagram 
+      associated with the following use case into reflecting the communication patterns and updated nodes**
+      
+      {{use-case}}
+      
+      **Hints**:
+      - use autonumber to clearly express the order of the actions
+      - where applicable indicate the lifespan of the objects (activate/deactivate)
 
