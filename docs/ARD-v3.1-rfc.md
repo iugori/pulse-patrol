@@ -578,8 +578,8 @@ Support <-->|HTTPS + WSS|Dashboard
 Portal -->|OIDC/OAuth2|AAA
 Dashboard -->|OIDC/OAuth2|AAA
 Portal -->|REST|PMS
-Dashboard <-->|REST|TAS
-Dashboard -->|REST|PMS
+Dashboard <-->|REST/gRPC|TAS
+Dashboard -->|REST/gRPC|PMS
 PMS -->|&lpar ; Read&rpar;|PMSq
 TAS -->|&lpar ; Read&rpar;|TASq
 %% Integration & Telemetry
