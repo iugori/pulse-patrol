@@ -50,13 +50,13 @@ func TestSayHello(t *testing.T) {
 
 	// 4. Execute the RPC
 	client := api.NewGreeterClient(conn)
-	resp, err := client.SayHello(context.Background(), &api.HelloRequest{Name: "World"})
+	resp, err := client.SayHello(context.Background(), &api.HelloRequest{Name: "sTA"})
 
 	// 5. Verify Results
 	if err != nil {
 		t.Fatalf("SayHello failed: %v", err)
 	}
-	if resp.GetMessage() != "Hello World" {
+	if resp.GetMessage() != "Hello sTA!" {
 		t.Errorf("Expected 'Hello World', got %s", resp.GetMessage())
 	}
 }
