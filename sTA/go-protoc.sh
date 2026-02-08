@@ -1,5 +1,7 @@
 #!/bin/zsh
 
+# this script will generate the Go protobuf artifacts
+
 GOPATH_BIN="$(go env GOPATH)/bin"
 export PATH="$PATH:$GOPATH_BIN"
 
