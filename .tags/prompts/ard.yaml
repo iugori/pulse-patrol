@@ -8,7 +8,7 @@ parameters:
   stopSequences: null
 
 defaults:
-  adr-communication: "file://docs/adr-v3.1-rfc.md#adr"
+  adr-communication: "file://docs/adr-v3.2-final.md#adr"
   business-requirements: "file://docs/ARD-v3.1-rfc.md#business-requirements"
   container-diagram-communication: "file://docs/ARD-v3.1-rfc.md#container-diagram-communication"
   container-diagram-relationships: "file://docs/ARD-v3.1-rfc.md#container-diagram-relationships"
