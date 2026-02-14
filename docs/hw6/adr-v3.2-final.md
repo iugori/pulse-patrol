@@ -1,4 +1,4 @@
-# Architecture Decision Record - v3.1
+# Architecture Decision Record - v3.2
 
 > **<span style="font-size: 1.3em">Pulse Patrol</span>**
 >
@@ -7,7 +7,7 @@
 > alerts staff for abnormal values, and supports patient transfers between healthcare providers.*
 
 <!-- TOC -->
-* [Architecture Decision Record - v3.1](#architecture-decision-record---v31)
+* [Architecture Decision Record - v3.2](#architecture-decision-record---v32)
   * [1. Context](#1-context)
     * [Scope](#scope)
     * [Architectural Nodes](#architectural-nodes)
