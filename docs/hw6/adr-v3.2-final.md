@@ -16,6 +16,7 @@
     * [A. Fully Synchronous Monolith (REST Everywhere)](#a-fully-synchronous-monolith-rest-everywhere)
     * [B. Pure Event-Driven Architecture (Event Sourcing)](#b-pure-event-driven-architecture-event-sourcing)
     * [C. Polling-Based Integration](#c-polling-based-integration)
+    * [D. Hybrid Synchronous/Asynchronous with Reactive Push (CHOSEN)](#d-hybrid-synchronousasynchronous-with-reactive-push-chosen)
   * [3. Decision](#3-decision)
     * [Architectural (Communication) Edges](#architectural-communication-edges)
       * [ePP / iADM → uiWP (User Portal Access)](#epp--iadm--uiwp-user-portal-access)
@@ -161,11 +162,21 @@ e.g., every 5 seconds).
 **Cons**: Inefficient. High battery drain on mobile devices for iSSM/iDOC and unacceptable delays for critical alerts. A
 5-second polling delay is too long for a cardiac arrest notification.
 
+### D. Hybrid Synchronous/Asynchronous with Reactive Push (CHOSEN)
+
+Combines synchronous REST/gRPC for user operations, asynchronous message queues
+for high-volume data, and reactive WebSocket push for real-time alerts.
+
+**Pros**: Balances immediate consistency for medical records with high-throughput
+for telemetry. Real-time push prevents alert delays.
+
+**Cons**: More complex infrastructure requiring multiple technologies.
+
 ## 3. Decision
 
 [//]: # (<< What alternative was chosen and why >>)
 
-The **Hybrid Architecture** was chosen to balance the immediate consistency required for medical records with the
+The **Hybrid Architecture** (D) was chosen to balance the immediate consistency required for medical records with the
 high-throughput, non-blocking requirements of medical telemetry and audit logging.
 
 - **Synchronous (REST/HTTPS)** is used for user-facing actions where immediate confirmation is required.

@@ -534,8 +534,8 @@ L1["External Dependency"]:::depExt
 L2["Internal Dependency"]:::depInt
 L3["Core System"]:::theSys
 L4["Container"]:::container
-Source[Source &lpar;initiates communication&rpar;] -->|Sync|Target
-Source[Source &lpar;initiates communication&rpar;] -.->|Async|Target
+Source["Source ⦅ initiates communication ⦆"] -->|Sync|Target
+Source["Source ⦅ initiates communication ⦆"] -.->|Async|Target
 end
 Diagram ~~~ Legend
 %%-
@@ -588,8 +588,8 @@ Dashboard -->|OIDC/OAuth2|AAA
 Portal -->|REST|PMS
 Dashboard <-->|REST/gRPC|TAS
 Dashboard -->|REST/gRPC|PMS
-PMS -->|&lpar ; Read&rpar;|PMSq
-TAS -->|&lpar ; Read&rpar;|TASq
+PMS -->|⦅ Read ⦆|PMSq
+TAS -->|⦅ Read ⦆|TASq
 %% Integration & Telemetry
 Equipment -->|MQTT QoS 0/2|Gateway
 Gateway <-->|HL7 FHIR / MLLP|Legacy
@@ -603,7 +603,7 @@ AAA -->|DB Driver|Saaa
 PMS -.->|Async Audit Queue| AAAq
 TAS -.->|Async Audit Queue|AAAq
 Gateway -.->|Async Audit Queue|AAAq
-AAA -->|&lpar ; Read&rpar ;|AAAq
+AAA -->|⦅ Read ⦆|AAAq
 %% Reactive Alerts
 TAS -->|Mobile Push|Doctor
 TAS -->|Mobile Push|Support
