@@ -454,6 +454,8 @@ The system will be decomposed into the following functional units:
 
 [//]: # (S: <container-diagram-relationships>)
 
+This diagram shows the logical relationships between containers, focusing on data dependencies.
+
 ```mermaid
 graph TB
     classDef depExt fill: #f8a3a3, stroke: #333, stroke-width: 1.5px;
@@ -519,6 +521,8 @@ graph TB
 
 ##### Container communication diagram
 
+This diagram shows the technical communication protocols and patterns (sync arrows, async dotted arrows with queues).
+
 [//]: # (S: <container-diagram-communication>)
 
 ```mermaid
@@ -528,88 +532,88 @@ graph TB
     classDef theSys fill: white, stroke: #333, stroke-width: 1.5px;
     classDef container fill: #92c6ff, stroke: #333, stroke-width: 1.5px;
 %%-
-subgraph Legend [Legend]
-direction TB
-L1["External Dependency"]:::depExt
-L2["Internal Dependency"]:::depInt
-L3["Core System"]:::theSys
-L4["Container"]:::container
-Source["Source ⦅ initiates communication ⦆"] -->|Sync|Target
-Source["Source ⦅ initiates communication ⦆"] -.->|Async|Target
-end
-Diagram ~~~ Legend
+    subgraph Legend [Legend]
+        direction TB
+        L1["External Dependency"]:::depExt
+        L2["Internal Dependency"]:::depInt
+        L3["Core System"]:::theSys
+        L4["Container"]:::container
+        Source["Source ⦅ initiates communication ⦆"] -->|Sync| Target
+        Source["Source ⦅ initiates communication ⦆"] -.->|Async| Target
+    end
+    Diagram ~~~ Legend
 %%-
-subgraph Diagram ["Container Diagram (Inter-Service Communication)"]
-direction LR
-Patient(("<br/>«person»<br/><span style='font-size:50px'>👤</span><br/><br/>&nbsp;&nbsp;Patient&nbsp;&nbsp;")):::depExt
-Admin(("<br/>«person»<br/><span style='font-size:50px'>👤</span><br/><br/>&nbsp;&nbsp;&nbsp;Admin&nbsp;&nbsp;&nbsp;")):::depInt
-Doctor(("<br/>«person»<br/><span style='font-size:50px'>👤</span><br/><br/>&nbsp;&nbsp;&nbsp;Doctor&nbsp;&nbsp;&nbsp;")):::depInt
-Support(("«person»<br/><br/><span style='font-size:56px'>👤</span><br/><br/>Support Staff")):::depInt
+    subgraph Diagram ["Container Diagram (Inter-Service Communication)"]
+        direction LR
+        Patient(("<br/>«person»<br/><span style='font-size:50px'>👤</span><br/><br/>&nbsp;&nbsp;Patient&nbsp;&nbsp;")):::depExt
+        Admin(("<br/>«person»<br/><span style='font-size:50px'>👤</span><br/><br/>&nbsp;&nbsp;&nbsp;Admin&nbsp;&nbsp;&nbsp;")):::depInt
+        Doctor(("<br/>«person»<br/><span style='font-size:50px'>👤</span><br/><br/>&nbsp;&nbsp;&nbsp;Doctor&nbsp;&nbsp;&nbsp;")):::depInt
+        Support(("«person»<br/><br/><span style='font-size:56px'>👤</span><br/><br/>Support Staff")):::depInt
 
-subgraph Pulse_Patrol_System ["«software system» 🫀 Pulse Patrol System Boundary"]
-direction TB
-Portal["«container»<br/>Web Portal (uiWP)"]:::container
-Dashboard["«container»<br/>Clinical Dashboard (uiCD)"]:::container
-Gateway["«container»<br/>Integration Gateway (sGW)"]:::container
+        subgraph Pulse_Patrol_System ["«software system» 🫀 Pulse Patrol System Boundary"]
+            direction TB
+            Portal["«container»<br/>Web Portal (uiWP)"]:::container
+            Dashboard["«container»<br/>Clinical Dashboard (uiCD)"]:::container
+            Gateway["«container»<br/>Integration Gateway (sGW)"]:::container
 
-subgraph ssPMS["&nbsp;"]
-PMSq[["«queue»<br/>PM"]]:::container
-PMS["«container»<br/>Patient Management (sPM)"]:::container
-Spms[("«container»<br/>Data Storage (pPM)")]:::container
-end
+            subgraph ssPMS["&nbsp;"]
+                PMSq[["«queue»<br/>PM"]]:::container
+                PMS["«container»<br/>Patient Management (sPM)"]:::container
+                Spms[("«container»<br/>Data Storage (pPM)")]:::container
+            end
 
-subgraph ssTAS["&nbsp;"]
-TASq[["«queue»<br/>TA"]]:::container
-TAS["«container»<br/>Telemetry & Alerting (sTA)"]:::container
-Stas[("«container»<br/>Data Storage (pTA)")]:::container
-end
+            subgraph ssTAS["&nbsp;"]
+                TASq[["«queue»<br/>TA"]]:::container
+                TAS["«container»<br/>Telemetry & Alerting (sTA)"]:::container
+                Stas[("«container»<br/>Data Storage (pTA)")]:::container
+            end
 
-subgraph ssAAA["&nbsp;"]
-direction LR
-AAAq[["«queue»<br/>Audit"]]:::container
-AAA["«container»<br/>Compliance & Identity (sAAA)"]:::container
-Saaa[("«container»<br/>Data Storage (pAAA)")]:::container
-end
-end
+            subgraph ssAAA["&nbsp;"]
+                direction LR
+                AAAq[["«queue»<br/>Audit"]]:::container
+                AAA["«container»<br/>Compliance & Identity (sAAA)"]:::container
+                Saaa[("«container»<br/>Data Storage (pAAA)")]:::container
+            end
+        end
 
-Peer["«software system»<br/>🌐 Peer Healthcare (ePEER)"]:::depExt
-Equipment["«software system»<br/>📠 Medical Equipment (iEQP)"]:::depInt
-Legacy["«software system»<br/>💾 Legacy Systems (iLEG)"]:::depInt
-end
+        Peer["«software system»<br/>🌐 Peer Healthcare (ePEER)"]:::depExt
+        Equipment["«software system»<br/>📠 Medical Equipment (iEQP)"]:::depInt
+        Legacy["«software system»<br/>💾 Legacy Systems (iLEG)"]:::depInt
+    end
 
 %% User to UI
-Patient -->|HTTPS|Portal
-Admin -->|HTTPS|Portal
-Doctor <-->|HTTPS + WSS|Dashboard
-Support <-->|HTTPS + WSS|Dashboard
+    Patient -->|HTTPS| Portal
+    Admin -->|HTTPS| Portal
+    Doctor <-->|HTTPS + WSS| Dashboard
+    Support <-->|HTTPS + WSS| Dashboard
 %% UI to Services
-Portal -->|OIDC/OAuth2|AAA
-Dashboard -->|OIDC/OAuth2|AAA
-Portal -->|REST|PMS
-Dashboard <-->|REST/gRPC|TAS
-Dashboard -->|REST/gRPC|PMS
-PMS -->|⦅ Read ⦆|PMSq
-TAS -->|⦅ Read ⦆|TASq
+    Portal -->|OIDC/OAuth2| AAA
+    Dashboard -->|OIDC/OAuth2| AAA
+    Portal -->|REST| PMS
+    Dashboard <-->|REST/gRPC| TAS
+    Dashboard -->|REST/gRPC| PMS
+    PMS -->|⦅ Read ⦆| PMSq
+    TAS -->|⦅ Read ⦆| TASq
 %% Integration & Telemetry
-Equipment -->|MQTT QoS 0/2|Gateway
-Gateway <-->|HL7 FHIR / MLLP|Legacy
-Gateway <-->|mTLS REST| Peer
-Gateway -..->|Async Message|PMSq
-Gateway -.->|Async Message|TASq
+    Equipment -->|MQTT QoS 0/2| Gateway
+    Gateway <-->|HL7 FHIR / MLLP| Legacy
+    Gateway <-->|mTLS REST| Peer
+    Gateway -..->|Async Message| PMSq
+    Gateway -.->|Async Message| TASq
 %% Backend to Persistence & Audit
-PMS -->|DB Driver|Spms
-TAS -->|DB Driver|Stas
-AAA -->|DB Driver|Saaa
-PMS -.->|Async Audit Queue| AAAq
-TAS -.->|Async Audit Queue|AAAq
-Gateway -.->|Async Audit Queue|AAAq
-AAA -->|⦅ Read ⦆|AAAq
+    PMS -->|DB Driver| Spms
+    TAS -->|DB Driver| Stas
+    AAA -->|DB Driver| Saaa
+    PMS -.->|Async Audit Queue| AAAq
+    TAS -.->|Async Audit Queue| AAAq
+    Gateway -.->|Async Audit Queue| AAAq
+    AAA -->|⦅ Read ⦆| AAAq
 %% Reactive Alerts
-TAS -->|Mobile Push|Doctor
-TAS -->|Mobile Push|Support
+    TAS -->|Mobile Push| Doctor
+    TAS -->|Mobile Push| Support
 %% Styling
-class Pulse_Patrol_System theSys
-style Pulse_Patrol_System fill: #f5f5f5, stroke: #333, stroke-width: 2px
+    class Pulse_Patrol_System theSys
+    style Pulse_Patrol_System fill: #f5f5f5, stroke: #333, stroke-width: 2px
 ```
 
 [//]: # (S: </container-diagram-communication>)
@@ -999,7 +1003,7 @@ AWS tools to support the Software Development Life Cycle (SDLC).
 | **AWS Secrets Manager**       | Securely encrypts, stores, and rotates database credentials, API keys, and other secrets. | [Secrets Manager Docs](https://docs.aws.amazon.com/secretsmanager/)                                 |
 | **AWS X-Ray**                 | Distributed tracing to analyze and debug microservice performance.                        | [X-Ray Docs](https://docs.aws.amazon.com/xray/)                                                     |
 | **Amazon API Gateway**        | Managed service for creating, publishing, and securing REST APIs.                         | [API Gateway Docs](https://docs.aws.amazon.com/apigateway/)                                         |
-| **Amazon Aurora**             | High-performance relational DB for patient records and admin data.                        | [Aurora Docs](https://docs.aws.amazon.com/rds/)                  |
+| **Amazon Aurora**             | High-performance relational DB for patient records and admin data.                        | [Aurora Docs](https://docs.aws.amazon.com/rds/)                                                     |
 | **Amazon CloudFront**         | Content Delivery Network (CDN) to serve the Web Portal with low latency.                  | [CloudFront Docs](https://docs.aws.amazon.com/cloudfront/)                                          |
 | **Amazon CloudWatch**         | Monitoring and observability service for logs, metrics, and alarms.                       | [CloudWatch Docs](https://docs.aws.amazon.com/cloudwatch/)                                          |
 | **Amazon Comprehend Medical** | NLP service to extract medical information from unstructured clinical text.               | [Comprehend Medical Docs](https://docs.aws.amazon.com/comprehend-medical/)                          |

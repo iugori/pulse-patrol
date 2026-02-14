@@ -27,10 +27,10 @@
       * [iEQP → sGW (Telemetry Ingestion)](#ieqp--sgw-telemetry-ingestion)
       * [iLEG ↔ sGW (Legacy Integration)](#ileg--sgw-legacy-integration)
       * [sGW ↔ ePEER (Inter-Provider Transfer)](#sgw--epeer-inter-provider-transfer)
-      * [sGW → sPM / sTA (Data Normalization)](#sgw--spm--sta-data-normalization)
+      * [sGW → [PMSq/TASq] → sPM / sTA (Data Normalization)](#sgw--pmsqtasq--spm--sta-data-normalization)
       * [sTA → iDOC / iSSM (Critical Alerting)](#sta--idoc--issm-critical-alerting)
       * [sPM / sTA / sAAA → pDS (Persistence Layer)](#spm--sta--saaa--pds-persistence-layer)
-      * [sPM / sTA / sGW → sAAA (Audit Logging)](#spm--sta--sgw--saaa-audit-logging)
+      * [sPM / sTA / sGW → [AAAq] → sAAA (Audit Logging)](#spm--sta--sgw--aaaq--saaa-audit-logging)
   * [4. Consequences](#4-consequences)
 <!-- TOC -->
 
@@ -242,11 +242,12 @@ _Type_: Synchronous, Request/Response, (mTLS REST API)
 
 _Detail_: Handshake-based transfer where either peer can initiate a record transfer request.
 
-#### sGW → sPM / sTA (Data Normalization)
+#### sGW → [PMSq/TASq] → sPM / sTA (Data Normalization)
 
 _Type_: Asynchronous, Queue, (Message Broker specific)
 
-_Detail_: The gateway pushes normalized data to the relevant service for processing or storage.
+_Detail_: The gateway pushes normalized data to intermediate queues (PMSq for patient management, TASq for telemetry).
+Services consume from their respective queues for processing and storage.
 
 #### sTA → iDOC / iSSM (Critical Alerting)
 
@@ -260,12 +261,13 @@ _Type_: Synchronous, Direct Connection, (DB Driver / gRPC)
 
 _Detail_: Services initiate read/write operations to their respective database schemas.
 
-#### sPM / sTA / sGW → sAAA (Audit Logging)
+#### sPM / sTA / sGW → [AAAq] → sAAA (Audit Logging)
 
 _Type_: Asynchronous, Queue, (Message Broker specific)
 
 _Detail_: Every time a patient data access occurs (e.g., a Doctor viewing a record, a new lab report coming in), the
-handling service emits an event containing the Actor ID, Patient ID, Timestamp, and Resource Accessed.
+handling service emits a fire-and-forget event to the Audit Queue (AAAq) containing the Actor ID, Patient ID, Timestamp,
+and Resource Accessed. The sAAA service consumes events from this queue.
 
 ## 4. Consequences
 
