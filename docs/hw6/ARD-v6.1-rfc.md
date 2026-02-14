@@ -480,13 +480,13 @@ graph TB
         Support(("«person»<br/>👤 Support&nbsp;<br/>Staff")):::depInt
 
         subgraph Pulse_Patrol_System ["«software system» 🫀 Pulse Patrol System Boundary&nbsp;"]
-            Portal["«container»<br/>Web Portal&nbsp;"]:::container
-            Dashboard["«container»<br/>Clinical Dashboard&nbsp;"]:::container
-            PMS["«container»<br/>Patient Management&nbsp;<br/>Services"]:::container
-            TAS["«container»<br/>Telemetry & Alerting&nbsp;<br/>Services"]:::container
-            Storage[("«container»<br/>Data Storage&nbsp;")]:::container
-            Gateway["«container»<br/>Integration Gateway&nbsp;"]:::container
-            CIS["«container»<br/>Compliance & Identity&nbsp;<br/>Services"]:::container
+            Portal["«container»<br/>Web Portal<br/>[S3 + CloudFront]"]:::container
+            Dashboard["«container»<br/>Clinical Dashboard<br/>[S3 + CloudFront]"]:::container
+            PMS["«container»<br/>Patient Management<br/>[ECS/Fargate]"]:::container
+            TAS["«container»<br/>Telemetry & Alerting<br/>[Lambda/Kinesis]"]:::container
+            Storage[("«container»<br/>Data Storage<br/>[Aurora + Timestream]")]:::container
+            Gateway["«container»<br/>Integration Gateway<br/>[IoT Core / API Gateway]"]:::container
+            CIS["«container»<br/>Compliance & Identity<br/>[ECS/Fargate]"]:::container
         end
 
         Peer["«software system»<br/>🌐 Peer Healthcare Companies&nbsp;"]:::depExt
