@@ -40,12 +40,12 @@
         * [Container relationships diagram](#container-relationships-diagram)
         * [Container communication diagram](#container-communication-diagram)
       * [Use Case Realization](#use-case-realization)
-        * [Use Case 1 (Patient)](#use-case-1-patient-1)
-        * [Use Case 2 (Doctor)](#use-case-2-doctor-1)
-        * [Use Case 3 (Doctor)](#use-case-3-doctor-1)
-        * [Use Case 4 (Support Staff)](#use-case-4-support-staff-1)
-        * [Use Case 5 (Administrator)](#use-case-5-administrator-1)
-        * [Use Case 6 (Administrator)](#use-case-6-administrator-1)
+        * [Sequence 1 (Patient)](#sequence-1-patient)
+        * [Sequence 2 (Doctor)](#sequence-2-doctor)
+        * [Sequence 3 (Doctor)](#sequence-3-doctor)
+        * [Sequence 4 (Support Staff)](#sequence-4-support-staff)
+        * [Sequence 5 (Administrator)](#sequence-5-administrator)
+        * [Sequence 6 (Administrator)](#sequence-6-administrator)
   * [4. Deployment](#4-deployment)
     * [Runtime Technologies](#runtime-technologies)
       * [Compute & Frontend (Nodes)](#compute--frontend-nodes)
@@ -63,6 +63,8 @@
       * [Vital Signs & Monitoring](#vital-signs--monitoring)
       * [Notification & Alerting](#notification--alerting)
       * [Security & Audit (Generic)](#security--audit-generic)
+    * [API Specifications](#api-specifications)
+      * [Patient Transfer API](#patient-transfer-api)
   * [7. Security Concerns](#7-security-concerns)
   * [8. COGS](#8-cogs)
 <!-- TOC -->
@@ -622,7 +624,7 @@ graph TB
 
 [//]: # (S: <use-case-1>)
 
-##### Use Case 1 (Patient)
+##### Sequence 1 (Patient)
 
 As a **Patient**,
 I want **to access my medical records, test results, and admission forms through a web application**,
@@ -665,7 +667,7 @@ sequenceDiagram
 
 [//]: # (S: </use-case-1>)
 
-##### Use Case 2 (Doctor)
+##### Sequence 2 (Doctor)
 
 As a **Doctor**,
 I want **to access the data of my patients admitted to the hospital**,
@@ -719,7 +721,7 @@ sequenceDiagram
     deactivate CD
 ```
 
-##### Use Case 3 (Doctor)
+##### Sequence 3 (Doctor)
 
 As a **Doctor**,
 I want **to receive alerts for abnormal values detected by monitoring systems**,
@@ -765,7 +767,7 @@ sequenceDiagram
     deactivate CD
 ```
 
-##### Use Case 4 (Support Staff)
+##### Sequence 4 (Support Staff)
 
 As a **Support Staff Member**,
 I want **to receive alerts for abnormal values in patient monitoring**,
@@ -813,7 +815,7 @@ sequenceDiagram
     deactivate CD
 ```
 
-##### Use Case 5 (Administrator)
+##### Sequence 5 (Administrator)
 
 As an **Administrator**,
 I want **to manage patient records effectively**,
@@ -872,7 +874,7 @@ sequenceDiagram
     deactivate WP
 ```
 
-##### Use Case 6 (Administrator)
+##### Sequence 6 (Administrator)
 
 As an **Administrator**,
 I want **to facilitate the transfer of patients between healthcare companies**,
@@ -888,51 +890,61 @@ sequenceDiagram
     participant DS as «container»<br/>Data Storage<br/>(pDS)
     participant GW as «container»<br/>Integration Gateway<br/>(sGW)
     participant PEER as «software system»<br/>🌐 External Peer<br/>(ePEER)
+%% PHASE 1: VALIDATION
     A ->> WP: Initiate patient transfer & select peer
     activate WP
     WP ->> AAA: Verify Admin credentials (OIDC)
     activate AAA
-    AAA -->> WP: Identity Token
+    AAA -->> WP: Identity Token (JWT)
     deactivate AAA
-    WP ->> PMS: POST /transfers (patientId, peerId)
+    WP ->> PMS: POST /api/v1/transfers (patientId, targetProviderId, ...)
     activate PMS
-    PMS ->> DS: Fetch complete medical record
+    PMS ->> DS: 1.1 Verify Consent & Target Provider
     activate DS
-    DS -->> PMS: Full PII & Medical History
+    DS -->> PMS: Consent Validated
     deactivate DS
-
+%% PHASE 2: DATA AGGREGATION
+    PMS ->> DS: 2.1 Fetch Records (Aurora) & Vitals (Timestream)
+    activate DS
+    DS -->> PMS: Full Patient Data Set
+    deactivate DS
+%% PHASE 3: SECURITY (PACKAGING)
     rect rgb(230, 255, 230)
-        Note over PMS: Encrypt PII (AES-256) & <br/>Package for Residency Compliance
+        Note over PMS: 3.1 Encrypt PII (AES-256-GCM)<br/>3.2 Generate SHA-256 Hash<br/>3.3 Sign with Private Key
     end
-
-    PMS ->> GW: Forward transfer payload
+%% ASYNC HANDOFF
+    PMS -->> WP: 202 Accepted (transferId & trackingUrl)
+    deactivate PMS
+    WP -->> A: Display "Transfer Processing (ID: 9f3d...)"
+    deactivate WP
+%% PHASE 4: TRANSFER (BACKGROUND)
+    Note over PMS, PEER: Background Workflow Commences
+    activate PMS
+    PMS ->> GW: 4.1 Forward Encrypted Payload
     activate GW
     Note over GW, PEER: Protocol: mTLS REST API (Handshake)
-    GW ->> PEER: POST /incoming-transfer
+    GW ->> PEER: 4.2 POST /incoming-transfer
     activate PEER
 
     alt Transfer Successful
         PEER -->> GW: 201 Created (Acknowledgement)
         GW -->> PMS: Transfer Confirmed
-
-        par Async Finalization
-            PMS ->> DS: Mark record as "Archived/Transferred"
-            PMS -) AAA: Audit Log: External Data Export
+    %% PHASE 5: FINALIZATION
+        par Finalization Tasks
+            PMS ->> DS: 5.1 Mark record as "Transferred"
+            PMS -) AAA: 5.2 Emit Audit Event 
         end
-
-        PMS -->> WP: Success
-        WP -->> A: Display "Transfer Completed Successfully"
     else Transfer Failed
-        PEER -->> GW: Error (e.g., Timeout or Auth failure)
+        PEER -->> GW: 5xx Error / Timeout
         deactivate PEER
-        GW -->> PMS: Transfer Failed
+        GW -->> PMS: 4.3 Report Failure
         deactivate GW
-        PMS -->> WP: Error Alert
-        WP -->> A: Display "Transfer Error - Please retry"
+        PMS -) AAA: 5.3 Log Failed Transfer Attempt
     end
     deactivate PMS
-    deactivate WP
 ```
+Basis for [Patient Transfer API](#patient-transfer-api).
+
 
 ## 4. Deployment
 
@@ -1344,6 +1356,128 @@ More details will be added after security module will be researched in detail.
 - *AccessGranted*: Permission was successfully verified for a data request.
 - *UnauthorizedAccessDetected*: A security breach attempt was recognized.
 - ...
+
+### API Specifications
+
+#### Patient Transfer API
+
+*Endpoint:* `POST /api/v1/transfers`
+
+*Service:* Patient Management Service (sPM)
+
+*Authentication:* OAuth 2.0 Bearer Token (Admin role required)
+
+*Purpose:* Initiates a secure transfer of patient medical records to an external healthcare provider.
+
+*Request Parameters:*
+
+| Parameter            | Type          | Required | Description                                                                             |
+|----------------------|---------------|----------|-----------------------------------------------------------------------------------------|
+| `patientId`          | string (UUID) | Yes      | Unique identifier of the patient to transfer                                            |
+| `targetProviderId`   | string (UUID) | Yes      | Identifier of the receiving healthcare organization                                     |
+| `transferReason`     | string        | Yes      | Clinical justification for transfer (e.g., "Specialist referral", "Patient relocation") |
+| `includeTestResults` | boolean       | No       | Include laboratory results (default: true)                                              |
+| `includeTelemetry`   | boolean       | No       | Include last 48h of vital signs (default: false)                                        |
+| `consentDocumentId`  | string (UUID) | Yes      | Reference to patient consent for data sharing                                           |
+
+*Request Example:*
+
+```json
+POST /api/v1/transfers HTTP/1.1
+Host: api.pulsepatrol.health
+Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...
+Content-Type: application/json
+
+{
+"patientId": "550e8400-e29b-41d4-a716-446655440000",
+"targetProviderId": "7c9e6679-7425-40de-944b-e07fc1f90ae7",
+"transferReason": "Patient relocation to new city",
+"includeTestResults": true,
+"includeTelemetry": false,
+"consentDocumentId": "a3bb189e-8bf9-3888-9912-ace4e6543002"
+}
+```
+
+*Response (Success - 202 Accepted):*
+
+```json        
+{
+  "transferId": "9f3d7a8b-1c5e-4d2f-8a9b-7e6f5d4c3b2a",
+  "status": "processing",
+  "estimatedCompletionTime": "2026-02-15T14:35:00Z",
+  "trackingUrl": "/api/v1/transfers/9f3d7a8b-1c5e-4d2f-8a9b-7e6f5d4c3b2a/status"
+}
+```
+
+*Response (Error - 403 Forbidden):*
+
+```json
+{
+  "error": "INSUFFICIENT_PERMISSIONS",
+  "message": "Admin role required to initiate transfers",
+  "timestamp": "2026-02-15T14:32:15Z"
+}
+```
+
+*Response (Error - 409 Conflict):*
+
+```json
+{
+  "error": "CONSENT_MISSING",
+  "message": "Patient consent for data sharing not found or expired",
+  "requiredAction": "Obtain patient consent before transfer",
+  "timestamp": "2026-02-15T14:32:15Z"
+}
+```
+
+*Workflow:*
+
+Based on [Sequence 6 (Administrator)](#sequence-6-administrator) diagram
+
+1. Validation Phase:
+    - Verify admin authorization token
+    - Confirm patient consent is valid and not expired
+    - Check target provider exists in peer registry
+2. Data Aggregation Phase:
+    - Query medical records from Aurora database
+    - Fetch laboratory results if requested
+    - Retrieve vital signs from Timestream if requested
+3. Security Phase:
+    - Encrypt PII using AES-256-GCM
+    - Generate transfer package with integrity hash (SHA-256)
+    - Sign package with hospital's private key
+4. Transfer Phase:
+    - Send encrypted package to Integration Gateway (sGW)
+    - Gateway establishes mTLS tunnel to peer provider
+    - Peer provider returns acknowledgment or error
+5. Finalization Phase:
+    - Mark patient record as "Transferred" in local database
+    - Emit audit event to Compliance Service (sAAA)
+    - Send completion notification to requesting administrator
+
+*Status Codes:*
+
+| Code | Meaning               | Description                                    |
+|------|-----------------------|------------------------------------------------|
+| 202  | Accepted              | Transfer initiated successfully                |
+| 400  | Bad Request           | Invalid patientId or targetProviderId format   |
+| 401  | Unauthorized          | Missing or invalid authentication token        |
+| 403  | Forbidden             | User lacks admin privileges                    |
+| 404  | Not Found             | Patient or target provider not found           |
+| 409  | Conflict              | Missing consent or patient already transferred |
+| 500  | Internal Server Error | Database or encryption service failure         |
+| 502  | Bad Gateway           | Unable to reach target provider                |
+
+*Rate Limits:*
+
+- 10 transfers per administrator per hour
+- 100 transfers per organization per day
+
+*Compliance Notes:*
+
+- All transfers are logged in immutable audit trail (HIPAA requirement)
+- Transfer packages are encrypted at rest for 7 years (legal retention)
+- Patient can revoke consent retroactively; system will notify receiving provider
 
 ## 7. Security Concerns
 
