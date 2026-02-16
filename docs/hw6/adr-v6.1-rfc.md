@@ -26,8 +26,8 @@
 
 The problem is to design a persistence layer that satisfies two conflicting data patterns:
 
-1. **High Integrity & Relational Complexity:** Managing PII/PHI, medical histories, and complex relationships (
-   Doctor-Patient-Hospital) while ensuring HIPAA/GDPR compliance.
+1. **High Integrity & Relational Complexity:** Managing PII/PHI, medical histories, and complex relationships
+   (Doctor-Patient-Hospital) while ensuring HIPAA/GDPR compliance.
 2. **High-Velocity Ingestion:** Handling continuous streams of telemetry from medical equipment (vitals) that generate
    millions of data points per day, requiring rapid threshold analysis and alerting.
 
@@ -114,13 +114,13 @@ For **Vital Stream & Alerting (VSAS)**, we use **Amazon Timestream**. Telemetry 
 * **Positive (Benefits):**
     * **Performance Isolation:** Intensive vital sign writes do not impact the responsiveness of the web portal for
       patient record viewing.
-    * **Regulatory Compliance:** User credentials (CIS) can be encrypted with different keys than medical history (
-      CCRS).
+    * **Regulatory Compliance:** User credentials (CIS) can be encrypted with different keys than medical history
+      (CCRS).
     * **Scalability:** Timestream scales automatically to ingest millions of metrics per second.
 
 
 * **Negative (Trade-offs):**
-    * **Distributed Integrity:** We cannot use "JOIN" queries between vitals and patient names. The application layer (
-      VSAS) must perform the mapping.
+    * **Distributed Integrity:** We cannot use "JOIN" queries between vitals and patient names. The application layer
+      (VSAS) must perform the mapping.
     * **Complexity:** Developers must handle two different query languages (SQL for Aurora, and Timestream's SQL-like
       dialect).
