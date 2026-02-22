@@ -3,14 +3,13 @@ package greeting
 import (
 	"context"
 	"fmt"
-	"sTA/api"
 )
 
 type Server struct {
-	api.UnimplementedGreeterServer
+	UnimplementedGreeterServer
 }
 
-func (s *Server) SayHello(_ context.Context, in *api.HelloRequest) (*api.HelloResponse, error) {
+func (s *Server) SayHello(_ context.Context, in *HelloRequest) (*HelloResponse, error) {
 	name := in.GetName()
 	var responseMessage string
 
@@ -20,7 +19,7 @@ func (s *Server) SayHello(_ context.Context, in *api.HelloRequest) (*api.HelloRe
 		responseMessage = fmt.Sprintf("Hello %s!", name)
 	}
 
-	return &api.HelloResponse{
+	return &HelloResponse{
 		Message: responseMessage,
 	}, nil
 }

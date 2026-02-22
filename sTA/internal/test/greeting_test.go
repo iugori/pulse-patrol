@@ -8,7 +8,6 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/test/bufconn"
-	"sTA/api"
 	"sTA/internal/greeting"
 )
 
@@ -18,7 +17,7 @@ func TestSayHello(t *testing.T) {
 
 	// 1. Initialize Server
 	s := grpc.NewServer()
-	api.RegisterGreeterServer(s, &greeting.Server{})
+	greeting.RegisterGreeterServer(s, &greeting.Server{})
 
 	// Ensure server stops when test finishes to prevent leaks
 	defer s.Stop()
@@ -49,8 +48,8 @@ func TestSayHello(t *testing.T) {
 	}()
 
 	// 4. Execute the RPC
-	client := api.NewGreeterClient(conn)
-	resp, err := client.SayHello(context.Background(), &api.HelloRequest{Name: "sTA"})
+	client := greeting.NewGreeterClient(conn)
+	resp, err := client.SayHello(context.Background(), &greeting.HelloRequest{Name: "sTA"})
 
 	// 5. Verify Results
 	if err != nil {

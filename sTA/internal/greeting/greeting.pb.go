@@ -4,7 +4,7 @@
 // 	protoc        v6.33.4
 // source: api/greeting.proto
 
-package api
+package greeting
 
 import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
