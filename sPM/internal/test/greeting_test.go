@@ -3,7 +3,7 @@ package test
 import (
 	"net/http"
 	"net/http/httptest"
-	"sPM/api"
+	"sPM/internal/greeting"
 	"strings"
 	"testing"
 )
@@ -11,7 +11,7 @@ import (
 func TestGreetEndpoint(t *testing.T) {
 	req, _ := http.NewRequest("GET", "/hello?name=sPM", nil)
 	rr := httptest.NewRecorder()
-	handler := http.HandlerFunc(api.GreetHandler)
+	handler := http.HandlerFunc(greeting.GreetHandler)
 
 	handler.ServeHTTP(rr, req)
 

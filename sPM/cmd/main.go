@@ -3,12 +3,12 @@ package main
 import (
 	"log"
 	"net/http"
-	"sPM/api"
+	"sPM/internal/greeting"
 )
 
 func main() {
 	// API Route
-	http.HandleFunc("GET /hello", api.GreetHandler)
+	http.HandleFunc("GET /hello", greeting.GreetHandler)
 
 	port := ":8081"
 
