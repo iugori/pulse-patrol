@@ -70,7 +70,7 @@ are the most important points:
 ### Project structure
 
 <p align="center">
-  <img src="../misc/h5-project-structure.png" width="200">
+  <img src="../misc/hw5-project-structure.png" width="200">
 </p>
 
 ### REST service implementation
