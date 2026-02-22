@@ -120,15 +120,10 @@ OpenTelemetry dependencies added to `go.mod`:
 - `go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp`: HTTP instrumentation
 - `google.golang.org/grpc`: gRPC for OTLP transport
 
-## Troubleshooting
+## Performance testing 
 
-**Traces not appearing in SigNoz?**
+```bash
+brew install wrk
 
-1. Verify SigNoz is running: `docker ps | grep signoz`
-2. Check the OTLP collector is accessible: `nc -zv localhost 4317`
-3. Look for errors in service logs during startup
-4. Verify the endpoint configuration matches your SigNoz setup
-
-**Connection refused errors?**
-
-If you see "connection refused" errors, SigNoz may not be running or the endpoint may be incorrect. Double-check the SigNoz collector endpoint and ensure the port is open.
+wrk -t4 -c100 -d20s --latency http://localhost:8081
+```
