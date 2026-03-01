@@ -56,7 +56,7 @@
       * [Consolidated Technology Summary](#consolidated-technology-summary)
       * [SWOT Analysis: AWS AI Technologies](#swot-analysis-aws-ai-technologies)
     * [Deployment Diagram](#deployment-diagram)
-      * [**Key Architectural Components**](#key-architectural-components)
+      * [Key Architectural Components](#key-architectural-components)
   * [5. Dependencies](#5-dependencies)
   * [6. Data Flows/APIs](#6-data-flowsapis)
     * [Bounded Contexts](#bounded-contexts)
