@@ -1,0 +1,414 @@
+{
+  "id": "65b5c0bd-497c-4728-81a7-2f3916b92064",
+  "name": "pulse-patrol",
+  "createdAt": "March 8, 2026 at 16:15 (UTC+2:00)",
+  "expiresAt": "April 8, 2027 at 17:15 (UTC+3:00)",
+  "rateType": "BEFORE_DISCOUNTS",
+  "rateTimestamp": "March 8, 2026 at 16:15 (UTC+2:00)",
+  "status": "VALID",
+  "totalCostHistorical": 0,
+  "totalCostEstimated": 2645.8738103600003,
+  "currency": "USD",
+  "exportCreatedAt": "March 8, 2026 at 17:28 (UTC+2:00)",
+  "items": [
+    {
+      "serviceCode": "AWSIoT",
+      "usageType": "EUC1-ActionsExecuted",
+      "operation": "",
+      "location": "eu-central-1",
+      "usageId": "15a66c3f-c945-494c-9b55-7dc11ae59589",
+      "usageAccountId": 338087287478,
+      "accountName": "",
+      "group": "EMEA",
+      "quantity": {
+        "unit": "ActionsExecuted",
+        "amount": 1
+      },
+      "costSummary": {
+        "cost": 1.8e-7,
+        "currency": "USD",
+        "status": "new"
+      }
+    },
+    {
+      "serviceCode": "AmazonRDS",
+      "usageType": "EUC1-Aurora:StorageUsage",
+      "operation": "CreateDBInstance:0021",
+      "location": "eu-central-1",
+      "usageId": "28a2b30f-f706-4d41-b4d7-ee6f0b9a4ee5",
+      "usageAccountId": 338087287478,
+      "accountName": "",
+      "group": "EMEA",
+      "quantity": {
+        "unit": "GB-Mo",
+        "amount": 500
+      },
+      "costSummary": {
+        "cost": 59.5,
+        "currency": "USD",
+        "status": "new"
+      }
+    },
+    {
+      "serviceCode": "awskms",
+      "usageType": "eu-central-1-KMS-Keys",
+      "operation": "",
+      "location": "eu-central-1",
+      "usageId": "3216eff2-45fb-4440-9bc9-7f3659688c8c",
+      "usageAccountId": 338087287478,
+      "accountName": "",
+      "group": "EMEA",
+      "quantity": {
+        "unit": "Keys",
+        "amount": 3
+      },
+      "costSummary": {
+        "cost": 3,
+        "currency": "USD",
+        "status": "new"
+      }
+    },
+    {
+      "serviceCode": "AWSIoT",
+      "usageType": "EUC1-RegistryAndShadowOperations",
+      "operation": "",
+      "location": "eu-central-1",
+      "usageId": "332c8157-2036-4a49-b76e-115622ddb516",
+      "usageAccountId": 338087287478,
+      "accountName": "",
+      "group": "EMEA",
+      "quantity": {
+        "unit": "Operations",
+        "amount": 100
+      },
+      "costSummary": {
+        "cost": 0.00015,
+        "currency": "USD",
+        "status": "new"
+      }
+    },
+    {
+      "serviceCode": "AmazonTimestream",
+      "usageType": "EUC1-ClusterNodeUsage-Db.influxIOIncluded.medium",
+      "operation": "Compute:002",
+      "location": "eu-central-1",
+      "usageId": "345c8aea-c927-42e5-8ed6-46f81d139fbc",
+      "usageAccountId": 338087287478,
+      "accountName": "",
+      "group": "EMEA",
+      "quantity": {
+        "unit": "Hrs",
+        "amount": 8760
+      },
+      "costSummary": {
+        "cost": 1397.22,
+        "currency": "USD",
+        "status": "new"
+      }
+    },
+    {
+      "serviceCode": "AmazonS3",
+      "usageType": "EUC1-Requests-Tier1",
+      "operation": "",
+      "location": "eu-central-1",
+      "usageId": "439a2875-18d2-4801-a986-060ee9786929",
+      "usageAccountId": 338087287478,
+      "accountName": "",
+      "group": "EMEA",
+      "quantity": {
+        "unit": "Requests",
+        "amount": 100000
+      },
+      "costSummary": {
+        "cost": 0.54,
+        "currency": "USD",
+        "status": "new"
+      }
+    },
+    {
+      "serviceCode": "AmazonRDS",
+      "usageType": "EUC1-InstanceUsage:db.t3.medium",
+      "operation": "CreateDBInstance:0021",
+      "location": "eu-central-1",
+      "usageId": "575d6872-758b-4e42-8f2c-368baf68ae5c",
+      "usageAccountId": 338087287478,
+      "accountName": "",
+      "group": "EMEA",
+      "quantity": {
+        "unit": "Hrs",
+        "amount": 1460
+      },
+      "costSummary": {
+        "cost": 140.16,
+        "currency": "USD",
+        "status": "new"
+      }
+    },
+    {
+      "serviceCode": "AmazonS3",
+      "usageType": "EUC1-Select-Returned-Bytes",
+      "operation": "",
+      "location": "eu-central-1",
+      "usageId": "5c30c892-9c4e-48fd-9362-58abc0be4e46",
+      "usageAccountId": 338087287478,
+      "accountName": "",
+      "group": "EMEA",
+      "quantity": {
+        "unit": "GB",
+        "amount": 2048
+      },
+      "costSummary": {
+        "cost": 1.6384,
+        "currency": "USD",
+        "status": "new"
+      }
+    },
+    {
+      "serviceCode": "AmazonEC2",
+      "usageType": "EUC1-RegionalNatGateway-Bytes",
+      "operation": "RegionalNatGateway",
+      "location": "eu-central-1",
+      "usageId": "65f39b21-ed3c-4b9a-bc9b-87cb8da8bd85",
+      "usageAccountId": 338087287478,
+      "accountName": "",
+      "group": "EMEA",
+      "quantity": {
+        "unit": "GB",
+        "amount": 2
+      },
+      "costSummary": {
+        "cost": 0.104,
+        "currency": "USD",
+        "status": "new"
+      }
+    },
+    {
+      "serviceCode": "AWSIoT",
+      "usageType": "EUC1-RulesTriggered",
+      "operation": "",
+      "location": "eu-central-1",
+      "usageId": "66ab03b8-4202-4077-986d-9940b86f698e",
+      "usageAccountId": 338087287478,
+      "accountName": "",
+      "group": "EMEA",
+      "quantity": {
+        "unit": "RulesTriggered",
+        "amount": 1
+      },
+      "costSummary": {
+        "cost": 1.8e-7,
+        "currency": "USD",
+        "status": "new"
+      }
+    },
+    {
+      "serviceCode": "AmazonCloudWatch",
+      "usageType": "EUC1-CW:DatabaseInsights-vCPU-Hours",
+      "operation": "Aurora-PostgreSQL:Provisioned",
+      "location": "eu-central-1",
+      "usageId": "7eab1d31-3b86-478f-ac1b-0ba80eb7e3b0",
+      "usageAccountId": 338087287478,
+      "accountName": "",
+      "group": "EMEA",
+      "quantity": {
+        "unit": "vCPU-Hours",
+        "amount": 1460
+      },
+      "costSummary": {
+        "cost": 18.25,
+        "currency": "USD",
+        "status": "new"
+      }
+    },
+    {
+      "serviceCode": "AmazonRDS",
+      "usageType": "EUC1-Aurora:StorageIOUsage",
+      "operation": "CreateDBInstance:0021",
+      "location": "eu-central-1",
+      "usageId": "b724254e-f148-439f-99ea-a25dff570f12",
+      "usageAccountId": 338087287478,
+      "accountName": "",
+      "group": "EMEA",
+      "quantity": {
+        "unit": "IOs",
+        "amount": 2628000
+      },
+      "costSummary": {
+        "cost": 0.57816,
+        "currency": "USD",
+        "status": "new"
+      }
+    },
+    {
+      "serviceCode": "AmazonRDS",
+      "usageType": "EUC1-InstanceUsageIOOptimized:db.t3.medium",
+      "operation": "CreateDBInstance:0021",
+      "location": "eu-central-1",
+      "usageId": "ca193e82-a3fe-4cd4-970d-6a40cd08edbe",
+      "usageAccountId": 338087287478,
+      "accountName": "",
+      "group": "EMEA",
+      "quantity": {
+        "unit": "Hrs",
+        "amount": 1460
+      },
+      "costSummary": {
+        "cost": 182.5,
+        "currency": "USD",
+        "status": "new"
+      }
+    },
+    {
+      "serviceCode": "AmazonEC2",
+      "usageType": "EUC1-NatGateway-Hours",
+      "operation": "NatGateway",
+      "location": "eu-central-1",
+      "usageId": "d85106c3-fe36-4889-8cac-34003eec0806",
+      "usageAccountId": 338087287478,
+      "accountName": "",
+      "group": "EMEA",
+      "quantity": {
+        "unit": "Hrs",
+        "amount": 1460
+      },
+      "costSummary": {
+        "cost": 75.92,
+        "currency": "USD",
+        "status": "new"
+      }
+    },
+    {
+      "serviceCode": "AmazonS3",
+      "usageType": "EUC1-TimedStorage-ByteHrs",
+      "operation": "",
+      "location": "eu-central-1",
+      "usageId": "d89c21f4-88d2-4644-a400-c679778f37aa",
+      "usageAccountId": 338087287478,
+      "accountName": "",
+      "group": "EMEA",
+      "quantity": {
+        "unit": "GB-Mo",
+        "amount": 2048
+      },
+      "costSummary": {
+        "cost": 50.176,
+        "currency": "USD",
+        "status": "new"
+      }
+    },
+    {
+      "serviceCode": "AmazonS3",
+      "usageType": "EUC1-Select-Scanned-Bytes",
+      "operation": "",
+      "location": "eu-central-1",
+      "usageId": "da6cd096-363e-41d1-88e3-bf0800836196",
+      "usageAccountId": 338087287478,
+      "accountName": "",
+      "group": "EMEA",
+      "quantity": {
+        "unit": "GB",
+        "amount": 10
+      },
+      "costSummary": {
+        "cost": 0.0225,
+        "currency": "USD",
+        "status": "new"
+      }
+    },
+    {
+      "serviceCode": "AmazonCloudFront",
+      "usageType": "EU-DataTransfer-Out-Bytes",
+      "operation": "",
+      "location": "",
+      "usageId": "eaea7965-9335-4421-851d-eb897aaab05c",
+      "usageAccountId": 338087287478,
+      "accountName": "",
+      "group": "EMEA",
+      "quantity": {
+        "unit": "GB",
+        "amount": 2048
+      },
+      "costSummary": {
+        "cost": 174.08,
+        "currency": "USD",
+        "status": "new"
+      }
+    },
+    {
+      "serviceCode": "AmazonECS",
+      "usageType": "EUC1-Fargate-vCPU-Hours:perCPU",
+      "operation": "",
+      "location": "eu-central-1",
+      "usageId": "eb67907f-8446-45d6-a758-5c8175089652",
+      "usageAccountId": 338087287478,
+      "accountName": "",
+      "group": "EMEA",
+      "quantity": {
+        "unit": "hours",
+        "amount": 8760
+      },
+      "costSummary": {
+        "cost": 407.8656,
+        "currency": "USD",
+        "status": "new"
+      }
+    },
+    {
+      "serviceCode": "AmazonRDS",
+      "usageType": "EUC1-Aurora:IO-OptimizedStorageUsage",
+      "operation": "CreateDBInstance:0016",
+      "location": "eu-central-1",
+      "usageId": "f29b2b33-44aa-444a-bd23-d3272ed0401c",
+      "usageAccountId": 338087287478,
+      "accountName": "",
+      "group": "EMEA",
+      "quantity": {
+        "unit": "GB-Mo",
+        "amount": 500
+      },
+      "costSummary": {
+        "cost": 134,
+        "currency": "USD",
+        "status": "new"
+      }
+    },
+    {
+      "serviceCode": "AmazonS3",
+      "usageType": "EUC1-Requests-Tier2",
+      "operation": "",
+      "location": "eu-central-1",
+      "usageId": "fb65e336-7314-42bc-98e0-3f927133d4f2",
+      "usageAccountId": 338087287478,
+      "accountName": "",
+      "group": "EMEA",
+      "quantity": {
+        "unit": "Requests",
+        "amount": 500000
+      },
+      "costSummary": {
+        "cost": 0.215,
+        "currency": "USD",
+        "status": "new"
+      }
+    },
+    {
+      "serviceCode": "AmazonEC2",
+      "usageType": "EUC1-RegionalNatGateway-Hours",
+      "operation": "RegionalNatGateway",
+      "location": "eu-central-1",
+      "usageId": "ff564f80-6cb2-4f9d-b334-53b105624aeb",
+      "usageAccountId": 338087287478,
+      "accountName": "",
+      "group": "EMEA",
+      "quantity": {
+        "unit": "Hrs",
+        "amount": 2
+      },
+      "costSummary": {
+        "cost": 0.104,
+        "currency": "USD",
+        "status": "new"
+      }
+    }
+  ]
+}
