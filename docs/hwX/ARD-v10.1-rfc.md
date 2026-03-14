@@ -72,6 +72,7 @@
       * [Asset Identification Table](#asset-identification-table)
       * [Threat Identification Table](#threat-identification-table)
       * [Security Controls & Mitigation Table](#security-controls--mitigation-table)
+    * [Compliance with CIA Principles (Confidentiality, Integrity, Availability)](#compliance-with-cia-principles-confidentiality-integrity-availability)
   * [8. COGS](#8-cogs)
     * [8.1 Regions for Comparison](#81-regions-for-comparison)
     * [8.2 Selected AWS Services for Estimation](#82-selected-aws-services-for-estimation)
