@@ -1049,48 +1049,75 @@ Focusing on clinical value-add and automation.
 
 ```mermaid
 graph TD
+    classDef external fill:#f8a3a3,stroke:#333,stroke-width:1.5px;
+    classDef awsService fill:#232F3E,color:#fff,stroke:#232F3E;
+
 %% External Systems
     subgraph External_Systems [External Data Sources]
-        Monitors[Bedside Monitors]
-        PeerHosp[External Hospital Systems]
+        Monitors[Bedside Monitors]:::external
+        PeerHosp[External Hospital Systems]:::external
     end
 
 %% AWS Cloud
     subgraph AWS_Cloud [AWS Cloud - eu-central-1]
-        subgraph Public_Subnet [Public Subnet - Ingress]
-            API[Integration Gateway<br/>sGW / API Gateway]
-            IoT[IoT Core]
-        end
+        IGW[Internet Gateway]
+        
+        subgraph VPC [Virtual Private Cloud - 10.0.0.0/16]
+            direction TB
+            
+            subgraph Public_Subnet [Public Subnet - Ingress]
+                direction LR
+                ALB[Application Load Balancer]
+                IoT[IoT Core]
+                NAT[NAT Gateway]
+            end
 
-        subgraph Private_Subnet [Private Subnet - Logic]
-            Fargate[Fargate Cluster<br/>Processing Services<br/>sAAA, sPM, sTA]
+            subgraph Private_Subnet [Private Subnet - Logic]
+                direction TB
+                Fargate[Fargate Cluster<br/>sAAA, sPM, sTA]
+                
+                %% PrivateLink Endpoints
+                subgraph VPCE [Interface VPC Endpoints / PrivateLink]
+                    S3_EP[S3 Endpoint]
+                    TS_EP[Timestream Endpoint]
+                    KMS_EP[KMS / Secrets Endpoint]
+                end
 
-            subgraph Data_Tier [Storage Tier]
-                Aurora[(Aurora DB<br/>Relational Records)]
-                TS[(Timestream<br/>Vitals Telemetry)]
-                S3[(S3 Bucket<br/>Clinical Reports/<br/>Media Recordings)]
+                subgraph Data_Tier [Storage Tier]
+                    Aurora[(Aurora DB)]
+                    TS[(Timestream DB)]
+                    S3[(S3 Bucket)]
+                end
             end
         end
     end
 
 %% Connections
-    Monitors -->|MQTT / TLS 1 . 3| IoT
-    PeerHosp <-->|mTLS / REST| API
-    IoT -->|Stream Ingest| Fargate
-    API -->|Secure Proxy| Fargate
-    Fargate -->|Metadata Persistence| Aurora
-    Fargate -->|High - Frequency Logging| TS
-    Fargate -->|Immutable Archiving| S3
+    Monitors -->|MQTT/TLS 1.3| IGW
+    PeerHosp -->|mTLS/REST| IGW
+    IGW --> IoT
+    IGW --> ALB
+    
+    ALB -->|Forward| Fargate
+    IoT -->|Ingest| Fargate
+    
+    %% Internal Routing via PrivateLink
+    Fargate --> S3_EP --> S3
+    Fargate --> TS_EP --> TS
+    Fargate --> KMS_EP
+    Fargate -->|ENI| Aurora
+
+    %% NAT for updates/external APIs
+    Fargate -.-> NAT -.-> IGW
+
 %% Styling
-    style AWS_Cloud fill: #f9f9f9, stroke: #0073BB, stroke-width: 2px
-    style Public_Subnet fill: #fff, stroke: #248814, stroke-dasharray: 5 5
-    style Private_Subnet fill: #fff, stroke: #248814, stroke-dasharray: 5 5
-    style API fill: #BA342E, color: #fff
-    style IoT fill: #277116, color: #fff
-    style Fargate fill: #F58534, color: #fff
-    style Aurora fill: #4D4FC7, color: #fff
-    style TS fill: #4D4FC7, color: #fff
-    style S3 fill: #277116, color: #fff
+    style AWS_Cloud fill:#fff,stroke:#FF9900,stroke-width:2px
+    style VPC fill:#f9f9f9,stroke:#0073BB,stroke-width:2px
+    style Public_Subnet fill:#e1f5fe,stroke:#01579b,stroke-dasharray: 5 5
+    style Private_Subnet fill:#f1f8e9,stroke:#2e7d32,stroke-dasharray: 5 5
+    style VPCE fill:#fff,stroke:#232f3e,stroke-width:1px
+    style Fargate fill:#F58534,color:#fff
+    style ALB fill:#8C4FFF,color:#fff
 ```
 
 This diagram illustrates the **Pulse Patrol Automated Infrastructure**, a cloud-native deployment designed for secure,
@@ -1098,21 +1125,29 @@ high-velocity medical data ingestion and processing within the **AWS eu-central-
 
 #### Key Architectural Components
 
-* **External Data Sources:** The system integrates real-time telemetry from **Bedside Monitors** via MQTT/TLS 1.3 and
-  handles structured patient data exchanges with **External Hospital Systems** using secure mTLS REST calls.
-* **Ingress Layer (Public Subnet):** Acts as the secure perimeter. **IoT Core** manages device connectivity and message
-  routing, while the **Integration Gateway (sGW)** serves as the protected entry point for API-based traffic.
-* **Processing Logic (Private Subnet):** The **Fargate Cluster** hosts the core microservices:
-* **sAAA:** Audit, Authentication, and Authorization.
-* **sPM:** Patient Management.
-* **sTA:** Telemetry and Alerting.
+* **External Data Sources**: Real-time telemetry is streamed from **Bedside Monitors** via MQTT/TLS 1.3, while
+  structured data exchanges with **External Hospital Systems** utilize secure mTLS REST calls.
+    * **VPC & Ingress Layer (Public Subnet)**:
+    * **VPC (10.0.0.0/16)**: Provides a logically isolated network environment to ensure HIPAA/GDPR compliance.
+    * **Internet Gateway (IGW) & NAT Gateway**: The IGW manages external traffic entry, while the NAT Gateway allows
+      private resources to securely fetch updates without being exposed to the public internet.
+    * **Application Load Balancer (ALB)**: Replaces basic gateway logic to distribute incoming traffic across the
+      Fargate cluster for high availability.
+    * **IoT Core**: Serves as the managed broker for device connectivity and telemetry routing.
 
 
-* **Multi-Model Storage Tier:** Data is persisted based on its type and access patterns:
-* **Aurora DB:** For relational metadata and Electronic Health Records (EHR).
-* **Timestream:** For high-frequency, time-series vitals telemetry.
-* **S3 Bucket:** For immutable archiving of clinical reports and media recordings using Object Lock for legal
-  compliance.
+* **Processing Logic (Private Subnet)**:
+    * **Fargate Cluster**: Hosts core microservices (**sAAA**, **sPM**, **sTA**) in a private environment, completely
+      isolated from direct public access.
+    * **VPC Endpoints (PrivateLink)**: Enables the Fargate cluster to communicate with S3, Timestream, and KMS over the
+      private AWS backbone, ensuring sensitive PHI never traverses the public internet.
+
+
+* **Multi-Model Storage Tier**:
+    * **Aurora DB**: Stores relational metadata and Electronic Health Records (EHR).
+    * **Timestream**: A dedicated time-series database for high-velocity vitals telemetry.
+    * **S3 Bucket**: Provides immutable archiving for clinical reports and media recordings, utilizing **Object Lock**
+      for legal and regulatory compliance.
 
 ## 5. Dependencies
 
