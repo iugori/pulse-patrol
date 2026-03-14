@@ -1708,6 +1708,17 @@ PMS -.->|9. Log Transfer| AAA
 | **C04** | **OIDC & RBAC**           | Identity-based access control via sAAA to prevent vertical movement.          | TA01, TA05 |
 | **C05** | **VPC PrivateLink**       | Isolating database traffic within the AWS backbone, bypassing public routing. | TA02, TA04 |
 
+### Compliance with CIA Principles (Confidentiality, Integrity, Availability)
+
+The Pulse Patrol system architecture is engineered to protect **PHI (A01)** by strictly enforcing the CIA triad through
+the security controls identified in the threat model:
+
+| Principle           | Implementation Mechanism | Technical Description                                                                                                                                                                                                                                                       |
+|---------------------|--------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **Confidentiality** | **C01, C02, C04, C05**   | Access to sensitive records is restricted via **RBAC/OIDC (C04)**. Data is shielded from unauthorized viewing through **AES-256 encryption (C02)** at rest and in transit. Network isolation via **VPC PrivateLink (C05)** ensures PHI never traverses the public internet. |
+| **Integrity**       | **C01, C02, C03**        | **mTLS (C01)** ensures that data transferred to the `ePEER` remains unaltered. Any attempt to modify records (TA02) is mitigated by data signing, while the **Immutable Audit Trail (C03)** ensures that the history of the data cannot be falsified or deleted.            |
+| **Availability**    | **AWS Infrastructure**   | Availability is maintained through **Multi-AZ deployment** for the `pPM` database and the auto-scaling nature of the Fargate clusters. The **Integration Gateway (sGW)** ensures high-throughput availability for external requests even during peak load.                  |
+
 ## 8. COGS
 
 [//]: # (<<Cost estimation model for hardware, services, data storage and transfer for the whole solution>>)
