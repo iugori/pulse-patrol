@@ -68,6 +68,10 @@
     * [API Specifications](#api-specifications)
       * [Patient Transfer API](#patient-transfer-api)
   * [7. Security Concerns](#7-security-concerns)
+    * [Data Flow Diagram for  Use Case 6 (Patient Transfer)](#data-flow-diagram-for--use-case-6-patient-transfer)
+      * [Asset Identification Table](#asset-identification-table)
+      * [Threat Identification Table](#threat-identification-table)
+      * [Security Controls & Mitigation Table](#security-controls--mitigation-table)
   * [8. COGS](#8-cogs)
     * [8.1 Regions for Comparison](#81-regions-for-comparison)
     * [8.2 Selected AWS Services for Estimation](#82-selected-aws-services-for-estimation)
@@ -1592,6 +1596,117 @@ Based on [Sequence 6 (Administrator)](#sequence-6-administrator) diagram
 ## 7. Security Concerns
 
 [//]: # (<<Authorisation, Authentication, Data encryption, Threat modelling diagram>>)
+
+### Data Flow Diagram for  Use Case 6 (Patient Transfer)
+
+```mermaid
+graph LR
+  subgraph Public_Network ["🌐 Public Internet / External Organizations"]
+    Admin>«person»<br/>👤 Administrator]
+    Peer(("«software system»<br/>🌐 External Peer<br/>[ePEER]"))
+  end
+
+  subgraph AWS_Cloud ["☁️ AWS Cloud - System Boundary"]
+    subgraph Public_Subnet ["Public Subnet (DMZ)"]
+      WP("«container»<br/>Web Portal<br/>[uiWP]")
+      GW("«container»<br/>Integration Gateway<br/>[sGW]")
+      IGW["Internet Gateway"]
+    end
+
+    subgraph Private_Subnet ["Private Subnet (Logic & Data)"]
+      direction TB
+      PMS(("«container»<br/>Patient Management<br/>[sPM]"))
+      AAA(("«container»<br/>Compliance & Identity<br/>[sAAA]"))
+
+      subgraph Data_Layer ["Storage Tier"]
+        DS[("«database»<br/>Patient Records<br/>[pPM]")]
+      end
+    end
+  end
+
+%% Asset Labels (Brown)
+  A01{{A01}}:::asset_label --- DS
+  A02{{A02}}:::asset_label --- AAA
+  A03{{A03}}:::asset_label --- AAA
+  A04{{A04}}:::asset_label --- GW
+  A05{{A05}}:::asset_label --- PMS
+
+%% Threat Labels (Red)
+  TA01{{TA01}}:::threat_label --- IGW
+  TA02{{TA02}}:::threat_label --- DS
+  TA03{{TA03}}:::threat_label --- AAA
+  TA04{{TA04}}:::threat_label --- GW
+  TA05{{TA05}}:::threat_label --- PMS
+
+%% Control Labels (Green)
+  C01{{C01}}:::control_label --- GW
+  C02{{C02}}:::control_label --- DS
+  C03{{C03}}:::control_label --- AAA
+  C04{{C04}}:::control_label --- WP
+  C05{{C05}}:::control_label --- PMS
+
+%% Flow Logic
+Admin -- "1. Initiate [HTTPS]" --> IGW
+IGW -- "2. API Request [TLS]" --> WP
+WP -- "3. Secure Forward" --> PMS
+PMS -.->|4. Auth Check - OIDC | AAA
+PMS -- "5. Access Personal Health Information" --> DS
+PMS -- "6. Transfer Payload" --> GW
+GW -- "7. mTLS REST" --> IGW
+IGW -- "8. Secure Handshake" --> Peer
+PMS -.->|9. Log Transfer| AAA
+
+%% Styling
+  classDef boundary fill:none,stroke:#333,stroke-width:2px,stroke-dasharray: 5 5;
+  classDef public fill:#e1f5fe,stroke:#01579b;
+  classDef private fill:#f1f8e9,stroke:#2e7d32;
+  classDef external fill:#f8a3a3,stroke:#333;
+
+%% Label Styles
+  classDef asset_label fill:#d7ccc8,stroke:#5d4037,stroke-width:1px,color:#5d4037,font-weight:bold;
+  classDef threat_label fill:#DC143C,stroke:#721c24,stroke-width:1px,color:#FFFFFF,font-weight:bold;
+  classDef control_label fill:#2E7D32,stroke:#1B5E20,stroke-width:1px,color:#FFFFFF,font-weight:bold;
+  
+  class AWS_Cloud boundary;
+  class Public_Subnet public;
+  class Private_Subnet private;
+  class Peer external;
+
+%% Link Styling
+  linkStyle 0,1,2,3,4 stroke:#5d4037,stroke-width:1px,stroke-dasharray: 1;
+  linkStyle 5,6,7,8,9 stroke:#DC143C,stroke-width:1px,stroke-dasharray: 2;
+  linkStyle 10,11,12,13,14 stroke:#2E7D32,stroke-width:1px,stroke-dasharray: 4;
+```
+
+#### Asset Identification Table
+
+| ID      | Asset Name                | Description                                        | Sensitivity |
+|---------|---------------------------|----------------------------------------------------|-------------|
+| **A01** | **Patient Records (PHI)** | Highly sensitive medical data stored in `pPM`.     | *Critical*  |
+| **A02** | **Identity Tokens**       | OIDC/JWT credentials managed by `sAAA`.            | *High*      |
+| **A03** | **Audit Logs**            | Immutable records of access events in `sAAA`.      | *High*      |
+| **A04** | **Encryption Keys/Certs** | mTLS and SSL credentials used by `sGW`.            | *High*      |
+| **A05** | **Transfer Payloads**     | The transient data packets being moved to `ePEER`. | *Critical*  |
+
+#### Threat Identification Table
+
+| ID       | Threat Category            | Description                                                                                | Targeted Asset(s) |
+|----------|----------------------------|--------------------------------------------------------------------------------------------|-------------------|
+| **TA01** | **Spoofing**               | Adversary impersonates the `Administrator` or `External Peer` to gain unauthorized access. | A02, A05          |
+| **TA02** | **Tampering**              | Unauthorized modification of PHI in transit or at rest in `pPM`.                           | A01, A05          |
+| **TA03** | **Repudiation**            | Deletion or modification of audit logs in `sAAA` to hide malicious activity.               | A03               |
+| **TA04** | **Info Disclosure**        | Leakage of encryption keys from `sGW` or unencrypted PHI exposure.                         | A01, A04          |
+| **TA05** | **Elevation of Privilege** | User bypasses OIDC checks to gain administrative control over `sPM`.                       | A02, A05          |
+
+#### Security Controls & Mitigation Table
+
+| ID      | Control Name              | Description                                                                   | Mitigates  |
+|---------|---------------------------|-------------------------------------------------------------------------------|------------|
+| **C01** | **mTLS Authentication**   | Mutual TLS for all egress traffic to ensure only verified peers connect.      | TA01, TA04 |
+| **C02** | **AES-256 Encryption**    | Encryption at rest and in transit for PHI using AWS KMS managed keys.         | TA02, TA04 |
+| **C03** | **Immutable Audit Trail** | Log streaming to sAAA with write-once/read-many (WORM) properties.            | TA03       |
+| **C04** | **OIDC & RBAC**           | Identity-based access control via sAAA to prevent vertical movement.          | TA01, TA05 |
+| **C05** | **VPC PrivateLink**       | Isolating database traffic within the AWS backbone, bypassing public routing. | TA02, TA04 |
 
 ## 8. COGS
 
