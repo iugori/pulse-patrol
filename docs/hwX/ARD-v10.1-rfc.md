@@ -12,12 +12,12 @@
     * [Scope](#scope)
       * [Personas](#personas)
       * [Use cases](#use-cases)
-          * [Use Case 1 (Patient)](#use-case-1-patient)
-          * [Use Case 2 (Doctor)](#use-case-2-doctor)
-          * [Use Case 3 (Doctor)](#use-case-3-doctor)
-          * [Use Case 4 (Support Staff)](#use-case-4-support-staff)
-          * [Use Case 5 (Administrator)](#use-case-5-administrator)
-          * [Use Case 6 (Administrator)](#use-case-6-administrator)
+        * [Use Case 1 (Patient)](#use-case-1-patient)
+        * [Use Case 2 (Doctor)](#use-case-2-doctor)
+        * [Use Case 3 (Doctor)](#use-case-3-doctor)
+        * [Use Case 4 (Support Staff)](#use-case-4-support-staff)
+        * [Use Case 5 (Administrator)](#use-case-5-administrator)
+        * [Use Case 6 (Administrator)](#use-case-6-administrator)
       * [Data Sources and Particularities](#data-sources-and-particularities)
         * [Patient Identification & Demographic Data](#patient-identification--demographic-data)
         * [Electronic Health Records (EHR) & Admission Forms](#electronic-health-records-ehr--admission-forms)
@@ -37,8 +37,8 @@
     * [Data Flow Diagram](#data-flow-diagram)
   * [3. Individual Components Roles and Responsibilities](#3-individual-components-roles-and-responsibilities)
     * [Deployable Units (C4 Level 2)](#deployable-units-c4-level-2)
-        * [Container relationships diagram](#container-relationships-diagram)
-        * [Container communication diagram](#container-communication-diagram)
+      * [Container relationships diagram](#container-relationships-diagram)
+      * [Container communication diagram](#container-communication-diagram)
       * [Use Case Realization](#use-case-realization)
         * [Sequence 1 (Patient)](#sequence-1-patient)
         * [Sequence 2 (Doctor)](#sequence-2-doctor)
@@ -104,18 +104,18 @@ Develop a software system that:
 [//]: # (S: <personas>)
 
 1. **Patient**: Individual receiving medical care or treatment.
-    - R3: Patients require access to their health data via a web application.
+  - R3: Patients require access to their health data via a web application.
 
 2. **Doctor**: Medical professional providing care to patients.
-    - R4: Doctors require access to the data of patients admitted to the hospitals where they work.
-    - R5: They need to receive alerts to respond quickly to patient needs.
+  - R4: Doctors require access to the data of patients admitted to the hospitals where they work.
+  - R5: They need to receive alerts to respond quickly to patient needs.
 
 3. **Support Staff**: Support personnel assisting in patient care (e.g. nurses).
-    - R5: Medical staff need alerts for abnormal values in patient monitoring.
+  - R5: Medical staff need alerts for abnormal values in patient monitoring.
 
 4. **Administrator**: Manager overseeing the healthcare operation.
-    - R1: Administrators need to manage patient records effectively.
-    - R6: They facilitate patient transfers and ensure proper data handling.
+  - R1: Administrators need to manage patient records effectively.
+  - R6: They facilitate patient transfers and ensure proper data handling.
 
 [//]: # (S: </personas>)
 
@@ -970,12 +970,12 @@ This section maps the architectural nodes and edges to live AWS infrastructure.
 * **uiWP & uiCD (Web/Clinical Dashboards):** Hosted on **Amazon S3** (Static Website) and distributed via **Amazon
   CloudFront**.
 * **sPM, sTA, sAAA (Microservices):**
-    * *Primary:* **AWS Fargate (on Amazon ECS)**. Serverless container orchestration
-      provides scaling without managing VMs.
-    * *Alternative:* **AWS Lambda**. Lower cost for low-traffic services, but potential "cold starts" are risky for
-      sTA (
-      Telemetry).
-    * **Trade-off:** Fargate is better for the 24/7 uptime required by hospitals.
+  * *Primary:* **AWS Fargate (on Amazon ECS)**. Serverless container orchestration
+    provides scaling without managing VMs.
+  * *Alternative:* **AWS Lambda**. Lower cost for low-traffic services, but potential "cold starts" are risky for
+    sTA (
+    Telemetry).
+  * **Trade-off:** Fargate is better for the 24/7 uptime required by hospitals.
 
 
 * **sGW (Integration Gateway):** **AWS IoT Core** for MQTT (iEQP) and **Amazon API Gateway** for REST.
@@ -985,7 +985,7 @@ This section maps the architectural nodes and edges to live AWS infrastructure.
 * **Structured Records (sPM):** **Amazon Aurora (PostgreSQL)**. HIPAA-compliant and supports relational integrity.
 * **High-Frequency Telemetry (sTA):** **Amazon Timestream**. Optimized for time-series data from equipment.
 * **Clinical Reports/Images (S3):** **Amazon S3** with **S3 Object Lock** (for e-documents/signatures).
-    * *Optimization:* **S3 Intelligent-Tiering** to move old scans to cheaper storage automatically.
+  * *Optimization:* **S3 Intelligent-Tiering** to move old scans to cheaper storage automatically.
 
 * **Caching:** **Amazon ElastiCache (Redis)** for session data and hot patient records to reduce DB load.
 
@@ -1132,27 +1132,27 @@ high-velocity medical data ingestion and processing within the **AWS eu-central-
 
 * **External Data Sources**: Real-time telemetry is streamed from **Bedside Monitors** via MQTT/TLS 1.3, while
   structured data exchanges with **External Hospital Systems** utilize secure mTLS REST calls.
-    * **VPC & Ingress Layer (Public Subnet)**:
-    * **VPC (10.0.0.0/16)**: Provides a logically isolated network environment to ensure HIPAA/GDPR compliance.
-    * **Internet Gateway (IGW) & NAT Gateway**: The IGW manages external traffic entry, while the NAT Gateway allows
-      private resources to securely fetch updates without being exposed to the public internet.
-    * **Application Load Balancer (ALB)**: Replaces basic gateway logic to distribute incoming traffic across the
-      Fargate cluster for high availability.
-    * **IoT Core**: Serves as the managed broker for device connectivity and telemetry routing.
+  * **VPC & Ingress Layer (Public Subnet)**:
+  * **VPC (10.0.0.0/16)**: Provides a logically isolated network environment to ensure HIPAA/GDPR compliance.
+  * **Internet Gateway (IGW) & NAT Gateway**: The IGW manages external traffic entry, while the NAT Gateway allows
+    private resources to securely fetch updates without being exposed to the public internet.
+  * **Application Load Balancer (ALB)**: Replaces basic gateway logic to distribute incoming traffic across the
+    Fargate cluster for high availability.
+  * **IoT Core**: Serves as the managed broker for device connectivity and telemetry routing.
 
 
 * **Processing Logic (Private Subnet)**:
-    * **Fargate Cluster**: Hosts core microservices (**sAAA**, **sPM**, **sTA**) in a private environment, completely
-      isolated from direct public access.
-    * **VPC Endpoints (PrivateLink)**: Enables the Fargate cluster to communicate with S3, Timestream, and KMS over the
-      private AWS backbone, ensuring sensitive PHI never traverses the public internet.
+  * **Fargate Cluster**: Hosts core microservices (**sAAA**, **sPM**, **sTA**) in a private environment, completely
+    isolated from direct public access.
+  * **VPC Endpoints (PrivateLink)**: Enables the Fargate cluster to communicate with S3, Timestream, and KMS over the
+    private AWS backbone, ensuring sensitive PHI never traverses the public internet.
 
 
 * **Multi-Model Storage Tier**:
-    * **Aurora DB**: Stores relational metadata and Electronic Health Records (EHR).
-    * **Timestream**: A dedicated time-series database for high-velocity vitals telemetry.
-    * **S3 Bucket**: Provides immutable archiving for clinical reports and media recordings, utilizing **Object Lock**
-      for legal and regulatory compliance.
+  * **Aurora DB**: Stores relational metadata and Electronic Health Records (EHR).
+  * **Timestream**: A dedicated time-series database for high-velocity vitals telemetry.
+  * **S3 Bucket**: Provides immutable archiving for clinical reports and media recordings, utilizing **Object Lock**
+    for legal and regulatory compliance.
 
 ## 5. Dependencies
 
@@ -1164,22 +1164,22 @@ Entities interacting with the Pulse Patrol system:
 [//]: # (S: <external-entities>)
 
 - Human Actors
-    - *External*
-        - **Patients** - views personal medical history, test results, and treatment progress via the web portal
-    - *Internal*
-        - **Doctor** - accesses patient data within their hospital and receives critical physiological alerts
-        - **Support Staff Member** - nurses/assistants who receive real-time alerts for abnormal patient monitoring
-          values
-        - **Administrator** - manages records, oversees data integrity, and initiates inter-company patient transfers
+  - *External*
+    - **Patients** - views personal medical history, test results, and treatment progress via the web portal
+  - *Internal*
+    - **Doctor** - accesses patient data within their hospital and receives critical physiological alerts
+    - **Support Staff Member** - nurses/assistants who receive real-time alerts for abnormal patient monitoring
+      values
+    - **Administrator** - manages records, oversees data integrity, and initiates inter-company patient transfers
 - Technical Systems
-    - *External*
-        - **External Healthcare Companies Peer** - systems belonging to other providers that receive or send patient
-          data during a transfer
-    - *Internal*
-        - **Medical Equipment** - IoT devices and monitoring hardware (e.g., bedside monitors, ventilators) that stream
-          real-time telemetry
-        - **Legacy Hospital Systems** - existing legacy databases or EMRs where admission forms and historical medical
-          records may reside
+  - *External*
+    - **External Healthcare Companies Peer** - systems belonging to other providers that receive or send patient
+      data during a transfer
+  - *Internal*
+    - **Medical Equipment** - IoT devices and monitoring hardware (e.g., bedside monitors, ventilators) that stream
+      real-time telemetry
+    - **Legacy Hospital Systems** - existing legacy databases or EMRs where admission forms and historical medical
+      records may reside
 
 [//]: # (S: </external-entities>)
 
@@ -1550,25 +1550,25 @@ Content-Type: application/json
 Based on [Sequence 6 (Administrator)](#sequence-6-administrator) diagram
 
 1. Validation Phase:
-    - Verify admin authorization token
-    - Confirm patient consent is valid and not expired
-    - Check target provider exists in peer registry
+  - Verify admin authorization token
+  - Confirm patient consent is valid and not expired
+  - Check target provider exists in peer registry
 2. Data Aggregation Phase:
-    - Query medical records from Aurora database
-    - Fetch laboratory results if requested
-    - Retrieve vital signs from Timestream if requested
+  - Query medical records from Aurora database
+  - Fetch laboratory results if requested
+  - Retrieve vital signs from Timestream if requested
 3. Security Phase:
-    - Encrypt PII using AES-256-GCM
-    - Generate transfer package with integrity hash (SHA-256)
-    - Sign package with hospital's private key
+  - Encrypt PII using AES-256-GCM
+  - Generate transfer package with integrity hash (SHA-256)
+  - Sign package with hospital's private key
 4. Transfer Phase:
-    - Send encrypted package to Integration Gateway (sGW)
-    - Gateway establishes mTLS tunnel to peer provider
-    - Peer provider returns acknowledgment or error
+  - Send encrypted package to Integration Gateway (sGW)
+  - Gateway establishes mTLS tunnel to peer provider
+  - Peer provider returns acknowledgment or error
 5. Finalization Phase:
-    - Mark patient record as "Transferred" in local database
-    - Emit audit event to Compliance Service (sAAA)
-    - Send completion notification to requesting administrator
+  - Mark patient record as "Transferred" in local database
+  - Emit audit event to Compliance Service (sAAA)
+  - Send completion notification to requesting administrator
 
 *Status Codes:*
 
